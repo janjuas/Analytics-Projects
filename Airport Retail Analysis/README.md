@@ -45,7 +45,6 @@ Initial checks found five data issues that had to be resolved before any number 
 | Missing nationality | 8% of lines | Retained as unknown rather than imputed |
 | Returns | 1.5% of lines carry negative quantity and value | Retained. These are genuine business events and filtering them overstates net sales. |
 
-The duplicate and orphan-key records both date from the AX to R3 cutover weekend.
 
 ---
 
