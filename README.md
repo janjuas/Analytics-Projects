@@ -14,7 +14,7 @@ Each project lives in its **own top-level folder** and has its own report, expla
 
 | # | Project | Folder | Stack | Status |
 |---|---|---|---|---|
-| 1 | **Airport Travel Retail BI** — spend-per-passenger performance across a 25-outlet duty-free estate | [`Airport Retail Analytics/`](/AirportRetailAnalysis/) | Power BI · DAX · Python · Star schema | ✅ Complete |
+| 1 | **Airport Travel Retail BI** — spend-per-passenger performance across a 25-outlet duty-free estate | [`Airport Retail Analytics/`](https://github.com/janjuas/Analytics-Projects/tree/main/Airport%20Retail%20Analysis) | Power BI · DAX · Python · Star schema | ✅ Complete |
 
 ---
 
