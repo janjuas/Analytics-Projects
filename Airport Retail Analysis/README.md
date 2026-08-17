@@ -1,6 +1,6 @@
 # Project Background
 
-Modelio is an airport travel-retail operation running 25 outlets across two terminals and five concourses. The estate covers six divisions: Beauty & Fragrance, Liquor & Tobacco, Confectionery & Fine Food, Fashion & Accessories, Electronics & Gadgets, and Souvenirs & Local Gifts. Formats range from a 3,200 m² walkthrough duty free to 130 m² gate-side convenience units. Trading data runs from January 2023 to August 2026, and the business is mid-way through moving its reporting from AX Dynamics to R3.
+Modelio is an airport travel-retail operation running 25 outlets across two terminals and five concourses. The estate covers six divisions: Beauty & Fragrance, Liquor & Tobacco, Confectionery & Fine Food, Fashion & Accessories, Electronics & Gadgets, and Souvenirs & Local Gifts. Formats range from a 3,200 m² walkthrough duty free to 130 m² gate-side convenience units.
 
 Travel retail does not behave like high-street retail, and the difference sets the whole analytical frame. Sales are a function of how many passengers pass a store, what share of them transact, and what each buyer spends. Written as an identity:
 
