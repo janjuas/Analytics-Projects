@@ -86,6 +86,7 @@ Two specific problems sit underneath the aggregate. Concourse D Gate Shop is 12.
 * **Sales track the flight banks closely.** Hourly sales follow four distinct waves through the day and the passenger line sits on top of the sales columns for most hours. There is no large hour of the day where traffic arrives and sales do not follow, which suggests staffing is broadly matched to the schedule.
 
 ![Sales and Passenger](images/02-sales-passenger.png)
+[Link to Live Dashboard](https://app.powerbi.com/groups/me/reports/2e5ab5c2-bdba-4c48-9860-752470924a02/executive360?experience=power-bi)
 
 ### Category and vendor profitability
 
@@ -98,6 +99,7 @@ Two specific problems sit underneath the aggregate. Concourse D Gate Shop is 12.
 * **The middle of the price ladder holds the money.** Products priced $85 to $220 generate the largest share of net sales, followed by the $30 to $85 band. The $550-plus band contributes least despite occupying disproportionate space in the boutique formats.
 
 ![Category and Product](images/03-category-product.png)
+[Link to Live Dashboard](https://app.powerbi.com/groups/me/reports/2e5ab5c2-bdba-4c48-9860-752470924a02/executive360?experience=power-bi)
 
 ### Availability and supply reliability
 
@@ -110,7 +112,7 @@ Two specific problems sit underneath the aggregate. Concourse D Gate Shop is 12.
 * **On-time-in-full is low across the board and needs a definition review before it is acted on.** OTIF sits at 14.5% while PO fill rate is 94.7%. Suppliers are sending nearly everything ordered but rarely on the promised date. Before treating that as a supplier failure it is worth checking whether promised dates are being set realistically at the point of order.
 
 ![Inventory and Supply](images/04-inventory-supply.png)
-
+[Link to Live Dashboard](https://app.powerbi.com/groups/me/reports/2e5ab5c2-bdba-4c48-9860-752470924a02/executive360?experience=power-bi)
 ---
 
 # Recommendations:
