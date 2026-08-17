@@ -59,6 +59,7 @@ Average transaction value is flat year on year at $119.85. Two full years of cat
 Two specific problems sit underneath the aggregate. Concourse D Gate Shop is 12.4% below plan and down 3.8% on last year while its terminal's traffic grew, and one vendor is growing sales 11.6% while its contribution to the business falls 22.9%.
 
 ![Executive 360](images/01-executive-360.png)
+[Link to Live Dashboard](https://app.powerbi.com/groups/me/reports/2e5ab5c2-bdba-4c48-9860-752470924a02/executive360?experience=power-bi)
 
 ---
 
