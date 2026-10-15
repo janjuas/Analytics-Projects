@@ -34,3 +34,28 @@ One row per marketing campaign (30). TypeA campaigns are targeted: each particip
 16 coupons selected from the campaign's pool based on its purchase history. TypeB and TypeC campaigns
 send every coupon to every participating household. Coupons are valid between the start and end days.
 {% enddocs %}
+
+{% docs fct_sales_line %}
+One row per product line in a basket (2.6M rows), the most granular fact.
+
+Built incrementally: each run only adds days after the latest `date_key` already loaded
+(`delete+insert` on `transaction_line_id`), so a full rebuild is only needed with `--full-refresh`.
+
+Price fields follow the dunnhumby user guide's worked examples: `shelf_value` is the regular shelf price
+(amount received plus the loyalty discount and coupon match), and `customer_paid_value` is what the
+customer paid (amount received less any manufacturer coupon). Discounts are stored as positive amounts.
+{% enddocs %}
+
+{% docs fct_promo_exposure_weekly %}
+One row per product, store and week for the 115 promo-tracked stores in weeks 9-101.
+
+`causal_data` only records promoted product-weeks, so this fact combines it with weekly sales: weeks
+with sales but no display or mailer are kept as `is_promoted = 0`, which gives the baseline needed to
+measure promotion uplift. Promoted weeks with no panel sales are kept with zero units.
+{% enddocs %}
+
+{% docs fct_campaign_targeting %}
+One row per household targeted by a campaign (7,208 rows), with coupon redemptions and sales during
+the campaign vs. an equal-length window just before it. Compare targeted households' change in spend
+against similar non-targeted households to estimate campaign effect.
+{% enddocs %}

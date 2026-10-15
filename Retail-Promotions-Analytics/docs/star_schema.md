@@ -1,6 +1,6 @@
 # Target star schema (gold, `wh_gold.marts`)
 
-Status: all dimensions are built and tested (✅). Facts are planned, listed in build order.
+Status: the full star schema is built and tested (✅): 8 dimensions, 5 facts, 2 seeds. Analysis marts are next.
 
 ## Dimensions
 
@@ -18,13 +18,19 @@ Status: all dimensions are built and tested (✅). Facts are planned, listed in 
 
 | Model | Grain | Key measures | Notes |
 |---|---|---|---|
-| `fct_sales_line` | one product line in a basket | quantity, sales_value, retail_discount, coupon_discount, coupon_match_discount, derived shelf price | Large: materialise `incremental` on `day_number` to practise incremental models. |
-| `fct_basket` | basket_id | basket value, items, discount depth, coupon used | Aggregate of `fct_sales_line`. Good for basket-mix questions. |
-| `fct_promo_exposure_weekly` | product × store × week | is_on_display, is_in_mailer, display_code, mailer_code | From `stg_silver__causal`. Join to weekly sales to measure promotion uplift. |
-| `fct_campaign_targeting` | household × campaign | targeted flag, redeemed flag, redemptions | Fact without measures + redemptions. Gives campaign response rates. |
-| `fct_coupon_redemption` | household × coupon × day | 1 per redemption | Join back to `fct_sales_line` on household + day for redeemed value. |
+| `fct_sales_line` ✅ | product line in a basket (2.6M) | quantity, shelf / sales / customer-paid value, loyalty / coupon / coupon-match discounts, unit prices | Incremental (`delete+insert`). Price logic follows the user guide's worked examples, covered by a unit test. |
+| `fct_basket` ✅ | basket (276k trips) | lines, items, values, loyalty discount share, coupon used | Aggregate of `fct_sales_line`; reconciles to it in a test. |
+| `fct_promo_exposure_weekly` ✅ | product × store × week (38.6M) | display / mailer codes and flags, units, sales and shelf value, baskets | 115 tracked stores, weeks 9–101. Promoted weeks from `causal_data` plus non-promoted sales weeks as the baseline. |
+| `fct_campaign_targeting` ✅ | household × campaign (7,208) | coupons redeemed, sales during vs. equal window before | `is_window_complete` flags campaigns running past the last transaction day. |
+| `fct_coupon_redemption` ✅ | redemption (2,318) | coupon discount on matched same-day lines | Lines matched through the coupon's eligible products. |
 
-## Marts (analytics questions to answer)
+Supporting dimension: `dim_week` ✅ (103 weeks, with `is_promo_tracked_week`) for the weekly fact.
+
+## Analysis marts (`wh_gold.analysis`)
+
+Templates with steps, traps and acceptance tests are in `dbt/models/marts/analysis/`. Each model starts
+disabled; remove its `config(enabled=false)` line when it is written.
+
 
 - **Promotion uplift:** weekly unit sales when a product is on display or in the mailer vs. when it isn't, by department.
 - **Price elasticity / discount depth:** sales response to `retail_discount` depth by commodity.
@@ -32,10 +38,9 @@ Status: all dimensions are built and tested (✅). Facts are planned, listed in 
 - **Demographic segments (CACI angle):** spend, basket size and promo sensitivity by income band × household composition.
 - **Private label share:** private vs. national share by department over time.
 
-## Planned tests
+## Tests in place
 
-- `relationships` from every fact FK to its dimension.
-- `dbt_utils.expression_is_true`: basket totals equal the sum of their lines; discounts are ≤ 0.
-- `dbt_utils.recency` / row-count checks between silver and gold (`dbt_utils.equal_rowcount`).
-- Model contracts (`contract: enforced: true`) on every published mart, as on `dim_product`.
-- At least one **unit test** (`unit_tests:` in YAML, dbt ≥1.8) on a derived metric such as shelf price.
+- Model contracts on every dimension and fact.
+- `relationships` from every fact key to its dimension, including seed-backed display and mailer codes.
+- Singular tests: no calendar gaps, no household dropped, campaign end ≥ start, `fct_sales_line` reconciles to staging (rows and value), basket totals reconcile to lines.
+- Unit test `sales_line_prices_match_user_guide_examples`: the guide's three receipt lines plus a quantity-0 line.
