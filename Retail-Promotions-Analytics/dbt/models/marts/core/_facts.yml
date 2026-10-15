@@ -1,0 +1,317 @@
+version: 2
+
+models:
+  - name: dim_week
+    description: One row per source week (WEEK_NO). Weekly facts join here; promo tracking covers weeks 9-101.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: week_number
+        data_type: int
+        data_tests: [unique, not_null]
+      - name: week_start_date
+        data_type: date
+      - name: week_end_date
+        data_type: date
+      - name: days_in_week
+        data_type: int
+        description: 7 except the partial first week (days 1-5) and the last week.
+      - name: study_year
+        data_type: int
+      - name: is_promo_tracked_week
+        data_type: int
+        description: 1 for weeks covered by display and mailer data (causal_data).
+
+  - name: fct_sales_line
+    description: '{{ doc("fct_sales_line") }}'
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: transaction_line_id
+        data_type: varchar(50)
+        data_tests: [unique, not_null]
+      - name: basket_id
+        data_type: bigint
+        data_tests: [not_null]
+      - name: date_key
+        data_type: int
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: week_number
+        data_type: int
+      - name: household_sk
+        data_type: varchar(50)
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_household')
+                field: household_sk
+      - name: product_sk
+        data_type: varchar(50)
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_product')
+                field: product_sk
+      - name: store_sk
+        data_type: varchar(50)
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_store')
+                field: store_sk
+      - name: transaction_time_hhmm
+        data_type: int
+      - name: quantity
+        data_type: int
+      - name: shelf_value
+        data_type: decimal(12,2)
+        description: Regular shelf price x quantity, before the loyalty discount and coupon match.
+      - name: sales_value
+        data_type: decimal(12,2)
+        description: Amount the retailer receives (after loyalty discount and coupon match).
+      - name: customer_paid_value
+        data_type: decimal(12,2)
+        description: Amount the customer paid (sales_value less any manufacturer coupon).
+      - name: loyalty_discount_value
+        data_type: decimal(12,2)
+        description: Loyalty-card discount as a positive amount.
+      - name: coupon_discount_value
+        data_type: decimal(12,2)
+        description: Manufacturer coupon discount as a positive amount.
+      - name: coupon_match_discount_value
+        data_type: decimal(12,2)
+        description: Retailer's match of the manufacturer coupon as a positive amount.
+      - name: shelf_unit_price
+        data_type: decimal(12,4)
+        description: shelf_value / quantity; null for the ~14k quantity-0 lines.
+      - name: paid_unit_price
+        data_type: decimal(12,4)
+      - name: has_loyalty_discount
+        data_type: int
+      - name: has_coupon
+        data_type: int
+
+  - name: fct_basket
+    description: One row per shopping trip (basket). Aggregated from fct_sales_line.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: basket_id
+        data_type: bigint
+        data_tests: [unique, not_null]
+      - name: household_sk
+        data_type: varchar(50)
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_household')
+                field: household_sk
+      - name: store_sk
+        data_type: varchar(50)
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_store')
+                field: store_sk
+      - name: date_key
+        data_type: int
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: week_number
+        data_type: int
+      - name: basket_time_hhmm
+        data_type: int
+      - name: line_count
+        data_type: int
+      - name: item_quantity
+        data_type: int
+      - name: distinct_products
+        data_type: int
+      - name: shelf_value
+        data_type: decimal(14,2)
+      - name: sales_value
+        data_type: decimal(14,2)
+      - name: customer_paid_value
+        data_type: decimal(14,2)
+      - name: loyalty_discount_value
+        data_type: decimal(14,2)
+      - name: coupon_discount_value
+        data_type: decimal(14,2)
+      - name: loyalty_discount_share
+        data_type: decimal(9,4)
+        description: Loyalty discount as a share of basket shelf value (discount depth).
+      - name: has_coupon
+        data_type: int
+
+  - name: fct_promo_exposure_weekly
+    description: '{{ doc("fct_promo_exposure_weekly") }}'
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [product_sk, store_sk, week_number]
+    columns:
+      - name: product_sk
+        data_type: varchar(50)
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_product')
+                field: product_sk
+      - name: store_sk
+        data_type: varchar(50)
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_store')
+                field: store_sk
+      - name: week_number
+        data_type: int
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_week')
+                field: week_number
+      - name: display_code
+        data_type: varchar(1)
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_display_location')
+                field: display_code
+      - name: mailer_code
+        data_type: varchar(1)
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_mailer_location')
+                field: mailer_code
+      - name: is_on_display
+        data_type: int
+      - name: is_in_mailer
+        data_type: int
+      - name: is_promoted
+        data_type: int
+      - name: units_sold
+        data_type: int
+      - name: sales_value
+        data_type: decimal(14,2)
+      - name: shelf_value
+        data_type: decimal(14,2)
+      - name: baskets
+        data_type: int
+
+  - name: fct_campaign_targeting
+    description: '{{ doc("fct_campaign_targeting") }}'
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [household_sk, campaign_sk]
+    columns:
+      - name: household_sk
+        data_type: varchar(50)
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_household')
+                field: household_sk
+      - name: campaign_sk
+        data_type: varchar(50)
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_campaign')
+                field: campaign_sk
+      - name: start_date_key
+        data_type: int
+      - name: coupons_redeemed
+        data_type: int
+      - name: has_redeemed
+        data_type: int
+      - name: sales_during_campaign
+        data_type: decimal(14,2)
+      - name: sales_before_campaign
+        data_type: decimal(14,2)
+        description: Sales in the equal-length window immediately before the campaign started.
+      - name: is_window_complete
+        data_type: int
+        description: 0 when the campaign ends after the last transaction day, so the during-window is truncated.
+
+  - name: fct_coupon_redemption
+    description: One row per coupon redemption (household, coupon, campaign, day).
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: redemption_id
+        data_type: varchar(50)
+        data_tests: [unique, not_null]
+      - name: household_sk
+        data_type: varchar(50)
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_household')
+                field: household_sk
+      - name: campaign_sk
+        data_type: varchar(50)
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_campaign')
+                field: campaign_sk
+      - name: date_key
+        data_type: int
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: coupon_upc
+        data_type: varchar(20)
+      - name: coupon_discount_value
+        data_type: decimal(12,2)
+        description: >
+          Coupon discount on the household's same-day purchases of products the coupon is valid for.
+          If two redeemed coupons cover the same product on the same day, the line counts toward both.
+      - name: matched_lines
+        data_type: int
+
+unit_tests:
+  - name: sales_line_prices_match_user_guide_examples
+    description: The three worked receipt lines from the dunnhumby user guide, plus a quantity-0 line.
+    model: fct_sales_line
+    overrides:
+      macros:
+        is_incremental: false
+    given:
+      - input: ref('stg_silver__transactions')
+        rows:
+          - {transaction_line_id: 'line1', basket_id: 35730137393, household_key: 2381, product_id: 819063, store_id: 32004, day_number: 534, week_number: 77, transaction_time_hhmm: 2025, quantity: 1, sales_value: 1.67, retail_discount: 0, coupon_discount: 0, coupon_match_discount: 0}
+          - {transaction_line_id: 'line2', basket_id: 41756231898, household_key: 1431, product_id: 819063, store_id: 446, day_number: 671, week_number: 97, transaction_time_hhmm: 1740, quantity: 2, sales_value: 2.00, retail_discount: -1.34, coupon_discount: 0, coupon_match_discount: 0}
+          - {transaction_line_id: 'line3', basket_id: 36027750817, household_key: 888, product_id: 819063, store_id: 401, day_number: 540, week_number: 78, transaction_time_hhmm: 1254, quantity: 2, sales_value: 2.89, retail_discount: 0, coupon_discount: -0.55, coupon_match_discount: -0.45}
+          - {transaction_line_id: 'line4', basket_id: 1, household_key: 1, product_id: 1, store_id: 1, day_number: 1, week_number: 1, transaction_time_hhmm: 900, quantity: 0, sales_value: 0.79, retail_discount: 0.79, coupon_discount: 0, coupon_match_discount: 0}
+    expect:
+      rows:
+        - {transaction_line_id: 'line1', shelf_value: 1.67, customer_paid_value: 1.67, loyalty_discount_value: 0.00, shelf_unit_price: 1.6700}
+        - {transaction_line_id: 'line2', shelf_value: 3.34, customer_paid_value: 2.00, loyalty_discount_value: 1.34, shelf_unit_price: 1.6700}
+        - {transaction_line_id: 'line3', shelf_value: 3.34, customer_paid_value: 2.34, loyalty_discount_value: 0.00, shelf_unit_price: 1.6700}
+        - {transaction_line_id: 'line4', shelf_value: 0.00, customer_paid_value: 0.79, loyalty_discount_value: -0.79, shelf_unit_price: null}
