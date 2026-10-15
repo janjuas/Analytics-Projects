@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: dim_product
+    description: '{{ doc("dim_product") }}'
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: product_sk
+        data_type: varchar(50)
+        description: Surrogate key (hash of product_id).
+        data_tests: [unique, not_null]
+      - name: product_id
+        data_type: int
+        description: Natural key from the source system.
+        data_tests: [unique, not_null]
+      - name: manufacturer_id
+        data_type: int
+      - name: department
+        data_type: varchar(8000)
+        data_tests: [not_null]
+      - name: commodity
+        data_type: varchar(8000)
+      - name: sub_commodity
+        data_type: varchar(8000)
+      - name: brand_type
+        data_type: varchar(8000)
+        description: National brand or retailer private label.
+      - name: is_private_label
+        data_type: int
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+      - name: product_size
+        data_type: varchar(8000)

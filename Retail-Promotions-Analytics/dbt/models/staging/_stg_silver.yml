@@ -1,0 +1,124 @@
+version: 2
+
+models:
+  - name: stg_silver__transactions
+    description: Basket line items, renamed to project conventions. Grain = one product line in one basket.
+    columns:
+      - name: transaction_line_id
+        description: Surrogate key over all line attributes (the source has no line id).
+        data_tests: [unique, not_null]
+      - name: basket_id
+        data_tests: [not_null]
+      - name: household_key
+        data_tests: [not_null]
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_silver__products')
+                field: product_id
+      - name: day_number
+        description: Day of the two-year study, 1-711. Use dim_date to map to a calendar date.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+                max_value: 711
+      - name: week_number
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+                max_value: 102
+      - name: sales_value
+        description: Amount the retailer received for the line, after discounts.
+      - name: retail_discount
+        description: >
+          Loyalty-card discount (zero or negative). The source has ~10 positive values, mostly quantity-0 lines
+          where the discount equals sales_value (refund/price-correction style rows), so they are surfaced as a
+          warning and only fail the build if the count grows.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                max_value: 0
+              config:
+                severity: error
+                warn_if: ">0"
+                error_if: ">50"
+      - name: coupon_discount
+        description: Manufacturer coupon discount (zero or negative).
+      - name: coupon_match_discount
+        description: Retailer match of the manufacturer coupon (zero or negative).
+
+  - name: stg_silver__products
+    columns:
+      - name: product_id
+        data_tests: [unique, not_null]
+      - name: brand_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['National', 'Private']
+
+  - name: stg_silver__households
+    description: Demographics for the 801 households that shared them. Bands are anonymised in this copy of the dataset.
+    columns:
+      - name: household_key
+        data_tests: [unique, not_null]
+      - name: marital_status_code
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['X', 'Y', 'Z']
+
+  - name: stg_silver__campaigns
+    columns:
+      - name: campaign_id
+        data_tests: [unique, not_null]
+      - name: campaign_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['TypeA', 'TypeB', 'TypeC']
+      - name: duration_days
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+
+  - name: stg_silver__campaign_households
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [household_key, campaign_id]
+    columns:
+      - name: campaign_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_silver__campaigns')
+                field: campaign_id
+
+  - name: stg_silver__coupons
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [coupon_upc, product_id, campaign_id]
+
+  - name: stg_silver__coupon_redemptions
+    columns:
+      - name: campaign_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_silver__campaigns')
+                field: campaign_id
+
+  - name: stg_silver__causal
+    description: Weekly promo exposure (display / mailer) per product and store.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [product_id, store_id, week_number]

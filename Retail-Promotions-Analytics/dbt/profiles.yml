@@ -1,0 +1,40 @@
+# Committed on purpose: no secrets here, everything sensitive comes from environment variables.
+# Local dev uses your `az login` session (authentication: CLI). CI uses a service principal.
+dunnhumby_promo:
+  target: dev
+  outputs:
+    dev:
+      type: fabric
+      driver: "ODBC Driver 18 for SQL Server"
+      server: "{{ env_var('DBT_FABRIC_SERVER', '63lxcuql4fvu7iqtjpgd6no5fq-m7obfmaxqyaubhrmq7fc2hbezi.datawarehouse.fabric.microsoft.com') }}"
+      port: 1433
+      database: wh_gold
+      schema: dbo
+      authentication: CLI
+      threads: 4
+
+    ci:
+      type: fabric
+      driver: "ODBC Driver 18 for SQL Server"
+      server: "{{ env_var('DBT_FABRIC_SERVER', '') }}"
+      port: 1433
+      database: wh_gold
+      schema: dbo
+      authentication: ServicePrincipal
+      tenant_id: "{{ env_var('AZURE_TENANT_ID', '') }}"
+      client_id: "{{ env_var('AZURE_CLIENT_ID', '') }}"
+      client_secret: "{{ env_var('AZURE_CLIENT_SECRET', '') }}"
+      threads: 4
+
+    prod:
+      type: fabric
+      driver: "ODBC Driver 18 for SQL Server"
+      server: "{{ env_var('DBT_FABRIC_SERVER_PROD', '') }}"
+      port: 1433
+      database: wh_gold
+      schema: dbo
+      authentication: "{{ env_var('DBT_FABRIC_AUTH', 'ServicePrincipal') }}"
+      tenant_id: "{{ env_var('AZURE_TENANT_ID', '') }}"
+      client_id: "{{ env_var('AZURE_CLIENT_ID', '') }}"
+      client_secret: "{{ env_var('AZURE_CLIENT_SECRET', '') }}"
+      threads: 4

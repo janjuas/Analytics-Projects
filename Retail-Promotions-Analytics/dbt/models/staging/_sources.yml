@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: silver
+    description: >
+      Typed and cleaned dunnhumby "The Complete Journey" tables produced by the nb_02_silver_clean notebook
+      in the lh_silver Lakehouse. Read from wh_gold via cross-database query (same workspace).
+    database: lh_silver
+    schema: dbo
+    tables:
+      - name: transaction_data
+        description: One row per product line in a basket. ~2.6M rows over 711 days for 2,500 households.
+      - name: product
+        description: Product master (department, commodity, brand type, size).
+      - name: hh_demographic
+        description: Demographics for 801 of the 2,500 households.
+      - name: campaign_desc
+        description: The 30 marketing campaigns with type (A/B/C) and start/end day.
+      - name: campaign_table
+        description: Which households received which campaign.
+      - name: coupon
+        description: Coupons per campaign and the products each coupon is redeemable against.
+      - name: coupon_redempt
+        description: Coupon redemptions by household and day.
+      - name: causal_data
+        description: Weekly in-store display and mailer feature flags by product and store (~36.8M rows).
