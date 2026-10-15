@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Warehouse",
+    "displayName": "wh_gold",
+    "description": "Gold: dbt-built star schema (staging, dims, facts, marts) for promotions analytics."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "9e034c22-b2c5-8d5d-4eed-11a1f2e91e90"
+  }
+}

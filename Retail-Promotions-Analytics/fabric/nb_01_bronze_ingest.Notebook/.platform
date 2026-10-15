@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "nb_01_bronze_ingest",
+    "description": "Bronze: load Files/raw CSVs into raw_* Delta tables as strings + load metadata."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "16898462-d1cd-bdee-4864-2c0934d77549"
+  }
+}

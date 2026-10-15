@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataBuildToolJob",
+    "displayName": "dbt_promo_star_schema",
+    "description": "dbt build of the promotions star schema in wh_gold (staging + marts, tests)."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "67a994e6-8af7-b1db-4da8-ed637c1b6a07"
+  }
+}

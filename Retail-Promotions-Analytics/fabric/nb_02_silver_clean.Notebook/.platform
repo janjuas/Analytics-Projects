@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "nb_02_silver_clean",
+    "description": "Silver: type, clean, dedupe bronze tables into lh_silver with reject capture and PK checks."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "2b5e1a17-4f81-a049-412f-45c0891a9c48"
+  }
+}

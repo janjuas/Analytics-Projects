@@ -1,0 +1,39 @@
+{
+  "project": {
+    "projectType": "Lakehouse",
+    "folderPath": "dbt",
+    "connectionSettings": {
+      "name": "lh_silver",
+      "properties": {
+        "type": "Lakehouse",
+        "typeProperties": {
+          "workspaceId": "b012dc67-8617-4001-9e2c-87ca2d1c24ca",
+          "artifactId": "aba1354d-6905-47e8-852a-366ad2745478",
+          "endPoint": "63lxcuql4fvu7iqtjpgd6no5fq-m7obfmaxqyaubhrmq7fc2hbezi.datawarehouse.fabric.microsoft.com"
+        }
+      }
+    }
+  },
+  "profile": {
+    "profileType": "DataWarehouse",
+    "schema": "Gold_DH",
+    "connectionSettings": {
+      "name": "wh_gold",
+      "properties": {
+        "type": "DataWarehouse",
+        "typeProperties": {
+          "workspaceId": "b012dc67-8617-4001-9e2c-87ca2d1c24ca",
+          "artifactId": "f2e91e90-11a1-4eed-8d5d-b2c59e034c22",
+          "endPoint": "63lxcuql4fvu7iqtjpgd6no5fq-m7obfmaxqyaubhrmq7fc2hbezi.datawarehouse.fabric.microsoft.com"
+        }
+      }
+    }
+  },
+  "command": {
+    "operation": "build",
+    "arguments": {
+      "exclude": "",
+      "threads": 4
+    }
+  }
+}

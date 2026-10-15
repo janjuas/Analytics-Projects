@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "lh_bronze",
+    "description": "Bronze: raw dunnhumby CSVs in Files/raw and as-landed Delta tables (all strings + load metadata)."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "c07e0f4a-c092-9e94-42f9-36fe960dce80"
+  }
+}

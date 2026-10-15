@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "lh_silver",
+    "description": "Silver: typed, cleaned, deduplicated, conformed dunnhumby tables. Source for dbt."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "d2745478-366a-852a-47e8-6905aba1354d"
+  }
+}
