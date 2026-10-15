@@ -1,0 +1,5 @@
+dbt-core==1.12.6
+dbt-fabric==1.11.1
+azure-identity>=1.17
+azure-storage-file-datalake>=12.16
+requests>=2.31

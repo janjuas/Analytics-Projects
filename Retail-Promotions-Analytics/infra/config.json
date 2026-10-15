@@ -1,0 +1,15 @@
+{
+  "capacity_id": "6315ea76-3056-4f91-8209-24c0a6ad0e00",
+  "dev": {
+    "workspace_name": "dunnhumby-promo-dev",
+    "workspace_id": "b012dc67-8617-4001-9e2c-87ca2d1c24ca",
+    "lh_bronze_id": "960dce80-36fe-42f9-9e94-c092c07e0f4a",
+    "lh_silver_id": "aba1354d-6905-47e8-852a-366ad2745478",
+    "wh_gold_id": "f2e91e90-11a1-4eed-8d5d-b2c59e034c22",
+    "dbt_job_id": "7c1b6a07-ed63-4da8-b1db-8af767a994e6"
+  },
+  "prod": {
+    "workspace_name": "dunnhumby-promo-prod",
+    "workspace_id": "9da73741-81f4-4edc-a1c0-33045a507804"
+  }
+}

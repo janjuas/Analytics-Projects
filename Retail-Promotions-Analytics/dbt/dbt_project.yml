@@ -1,0 +1,31 @@
+name: dunnhumby_promo
+version: "1.0.0"
+config-version: 2
+profile: dunnhumby_promo
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # dunnhumby DAY 1 has no calendar date; anchor it so dim_date can expose real-looking dates. Change freely.
+  day_one_date: "2018-01-01"
+
+models:
+  dunnhumby_promo:
+    # no +persist_docs: Fabric Warehouse has no table/column comments (alter_column_comment is not implemented).
+    # Descriptions live in the dbt docs site instead.
+    staging:
+      +schema: staging
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
+
+data_tests:
+  dunnhumby_promo:
+    +store_failures: false
