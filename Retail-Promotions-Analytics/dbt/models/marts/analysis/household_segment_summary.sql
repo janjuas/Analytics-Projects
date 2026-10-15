@@ -1,42 +1,52 @@
 {#
-  QUESTION   How do spend, basket size and promotion sensitivity differ by income x household composition?
-
-  GRAIN      One row per income_band x household_composition, plus one row for households without
-             demographics ('Unknown' x 'Unknown') as a comparison group.
-
-  INPUTS     ref('dim_household')   income_band, household_composition, *_sort, has_demographics
-             ref('fct_basket')      basket-level sales_value, shelf_value, loyalty_discount_value, has_coupon
-
-  OUTPUT     income_band, income_band_sort, household_composition, household_composition_sort,
-             households, baskets, baskets_per_household, avg_basket_value, sales_per_household,
-             loyalty_discount_share, coupon_basket_share, is_small_segment
-
-  DEFINITIONS
-             loyalty_discount_share = sum(loyalty_discount_value) / sum(shelf_value)   (promo sensitivity)
-             coupon_basket_share    = share of baskets with has_coupon = 1
-             is_small_segment       = 1 when households < 10 (62 segments, several are tiny)
-
-  TRAPS
-  1. Aggregate baskets to household first, then to segment, so per-household figures are not
-     weighted by heavy shoppers.
-  2. Don't drop the 1,699 households without demographics; they form the 'Unknown' comparison row.
-  3. Carry the *_sort columns through so Power BI orders Level1..Level12 correctly.
-
-  WHEN DONE  Delete the config line below, then:
-             python infra/sync_dbt_job.py --run --select household_segment_summary
+  How do spend, basket size and promotion sensitivity differ by income x household composition?
+  Grain: one row per income_band x household_composition. Households without demographics fall into a
+  single 'Unknown' x 'Unknown' row, kept as a comparison group.
+  Baskets are summed per household first, so per-household figures are not weighted by heavy shoppers.
 #}
-{{ config(enabled=false) }}
 
 with household_totals as (
-    -- TODO: per household_sk from fct_basket: baskets, sales, shelf value, loyalty discount, coupon baskets
-    select 1 as placeholder
+    select
+        household_sk,
+        count(*)                    as baskets,
+        sum(sales_value)            as sales_value,
+        sum(shelf_value)            as shelf_value,
+        sum(loyalty_discount_value) as loyalty_discount_value,
+        sum(has_coupon)             as coupon_baskets
+    from {{ ref('fct_basket') }}
+    group by household_sk
 ),
 
 households as (
-    -- TODO: dim_household joined to household_totals (trap 2)
-    select * from household_totals
+    select
+        h.income_band,
+        h.income_band_sort,
+        h.household_composition,
+        h.household_composition_sort,
+        t.baskets,
+        t.sales_value,
+        t.shelf_value,
+        t.loyalty_discount_value,
+        t.coupon_baskets,
+        t.sales_value / nullif(t.baskets, 0) as household_avg_basket_value
+    from {{ ref('dim_household') }} as h
+    inner join household_totals as t
+        on h.household_sk = t.household_sk
 )
 
--- TODO: aggregate to income_band x household_composition (trap 1), add ratios and is_small_segment,
---       keep the sort columns (trap 3)
-select * from households
+select
+    cast(income_band as varchar(50))                                                     as income_band,
+    cast(income_band_sort as int)                                                        as income_band_sort,
+    cast(household_composition as varchar(50))                                          as household_composition,
+    cast(household_composition_sort as int)                                              as household_composition_sort,
+    cast(count(*) as int)                                                                as households,
+    cast(sum(baskets) as int)                                                            as baskets,
+    cast(avg(cast(baskets as decimal(18, 4))) as decimal(12, 2))                         as baskets_per_household,
+    cast(avg(household_avg_basket_value) as decimal(12, 2))                              as avg_basket_value,
+    cast(avg(sales_value) as decimal(14, 2))                                             as sales_per_household,
+    cast(sum(loyalty_discount_value) / nullif(sum(shelf_value), 0) as decimal(9, 4))     as loyalty_discount_share,
+    cast(sum(cast(coupon_baskets as decimal(18, 4))) / nullif(sum(baskets), 0) as decimal(9, 4))
+                                                                                         as coupon_basket_share,
+    cast(case when count(*) < 10 then 1 else 0 end as int)                               as is_small_segment
+from households
+group by income_band, income_band_sort, household_composition, household_composition_sort

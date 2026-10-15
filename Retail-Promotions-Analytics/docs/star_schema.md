@@ -28,8 +28,9 @@ Supporting dimension: `dim_week` ✅ (103 weeks, with `is_promo_tracked_week`) f
 
 ## Analysis marts (`wh_gold.analysis`)
 
-Templates with steps, traps and acceptance tests are in `dbt/models/marts/analysis/`. Each model starts
-disabled; remove its `config(enabled=false)` line when it is written.
+Built in `dbt/models/marts/analysis/`, merchandise only (`dim_product.is_merchandise`):
+`promo_uplift_by_department`, `discount_depth_response`, `campaign_effect`, `household_segment_summary`,
+`private_label_share`.
 
 
 - **Promotion uplift:** weekly unit sales when a product is on display or in the mailer vs. when it isn't, by department.

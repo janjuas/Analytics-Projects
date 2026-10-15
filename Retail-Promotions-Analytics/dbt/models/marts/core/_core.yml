@@ -34,6 +34,11 @@ models:
               arguments:
                 values: [0, 1]
                 quote: false
+      - name: is_merchandise
+        data_type: int
+        description: >
+          0 for fuel (KIOSK-GAS, quantities in gallons), miscellaneous transactions, coupons and unknown
+          items. Analysis marts use merchandise only so units and shares are comparable.
       - name: product_size
         data_type: varchar(8000)
 
