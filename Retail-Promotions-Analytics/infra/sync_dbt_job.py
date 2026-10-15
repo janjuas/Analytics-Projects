@@ -1,19 +1,14 @@
-"""Publish the local dbt project to the Fabric dbt job (dbt_promo_star_schema) and optionally run it.
+"""Publish the dbt project to the Fabric dbt job (dbt_promo_star_schema) and optionally run it.
 
-How the pieces fit:
-  * The dbt job's project source is a Lakehouse folder (set once in the Fabric UI: lh_silver > Files/dbt).
-    This script mirrors dbt/ into whatever Lakehouse folder the job points at. (Writing to the job's own
-    Code/ folder does not work: the editor and the run rebuild it from their saved state and wipe it.)
-  * The job's Warehouse profile/connection is also owned by the UI ("dbt configurations", needs your OAuth
-    sign-in). It is never touched here; only the command (build/run/test..., select/exclude) is updated, and only
-    when you pass different values.
-  * dbt_packages/ is uploaded so runs do not depend on `dbt deps`. Run `dbt deps` locally first.
+The project is mirrored into the Lakehouse folder the job reads from (lh_silver > Files/dbt), including
+dbt_packages/, so run `dbt deps` first. The job's Warehouse connection is left unchanged; only the dbt
+command is updated, and only when different values are passed.
 
     python infra/sync_dbt_job.py                 # upload only
-    python infra/sync_dbt_job.py --run           # upload, then run the job and wait (exit 1 if it fails)
+    python infra/sync_dbt_job.py --run           # upload, run the job, exit 1 if dbt reports errors
     python infra/sync_dbt_job.py --run --operation test --select "staging"
 
-Auth: your `az login` session (locally) or the service principal from `azure/login` (CI).
+Auth: Azure CLI login locally, or the service principal from `azure/login` in CI.
 """
 import argparse
 import base64
@@ -53,7 +48,7 @@ def project_files():
         if f.is_dir() or f.name in SKIP_FILES or any(p in SKIP_DIRS for p in rel.parts):
             continue
         if any(p.startswith(".") for p in rel.parts):
-            continue  # dot-folders (.github, .circleci, .env) break the job's project download
+            continue  # the dbt job cannot download projects containing dot-folders
         if rel.parts[0] == "dbt_packages" and len(rel.parts) > 2 and rel.parts[2] in PACKAGE_SKIP_DIRS:
             continue  # packages only need their macros at run time
         yield f, rel.as_posix()
@@ -141,7 +136,7 @@ def run_job(cfg: dict, poll_seconds: int = 15, timeout_minutes: int = 60) -> boo
             print(f"  ...{status}", flush=True)
             continue
         print(f"Fabric job status: {status} ({job.get('startTimeUtc', '')} -> {job.get('endTimeUtc', '')})")
-        # Fabric marks a run Failed when dbt reports any *warning*, so judge by dbt's own summary when available.
+        # Fabric marks a run Failed on dbt warnings too, so use dbt's own summary when available.
         summary = dbt_log_summary(cfg, run_id)
         if summary:
             d = summary["done"]

@@ -19,7 +19,7 @@ models:
                 to: ref('stg_silver__products')
                 field: product_id
       - name: day_number
-        description: Day of the two-year study, 1-711. Use dim_date to map to a calendar date.
+        description: Day of the two-year study, 1-711.
         data_tests:
           - not_null
           - dbt_utils.accepted_range:
@@ -36,9 +36,8 @@ models:
         description: Amount the retailer received for the line, after discounts.
       - name: retail_discount
         description: >
-          Loyalty-card discount (zero or negative). The source has ~10 positive values, mostly quantity-0 lines
-          where the discount equals sales_value (refund/price-correction style rows), so they are surfaced as a
-          warning and only fail the build if the count grows.
+          Loyalty-card discount (zero or negative). About 10 source lines carry a positive value, mostly
+          quantity-0 refund or price-correction lines; the range test warns on them and fails above 50.
         data_tests:
           - dbt_utils.accepted_range:
               arguments:

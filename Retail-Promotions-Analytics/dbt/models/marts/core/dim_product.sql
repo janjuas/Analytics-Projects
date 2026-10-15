@@ -1,7 +1,3 @@
-{#
-  Worked example of a gold dimension, so the full silver -> staging -> marts path is proven.
-  The rest of the star schema (see docs/star_schema.md) is yours to build.
-#}
 select
     {{ dbt_utils.generate_surrogate_key(['product_id']) }} as product_sk,
     product_id,

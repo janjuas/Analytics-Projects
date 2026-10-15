@@ -12,13 +12,11 @@ snapshot-paths: ["snapshots"]
 clean-targets: ["target", "dbt_packages"]
 
 vars:
-  # dunnhumby DAY 1 has no calendar date; anchor it so dim_date can expose real-looking dates. Change freely.
+  # Calendar date assigned to study DAY 1 (the source has day numbers only).
   day_one_date: "2018-01-01"
 
 models:
   dunnhumby_promo:
-    # no +persist_docs: Fabric Warehouse has no table/column comments (alter_column_comment is not implemented).
-    # Descriptions live in the dbt docs site instead.
     staging:
       +schema: staging
       +materialized: view

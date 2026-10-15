@@ -1,5 +1,4 @@
-# Committed on purpose: no secrets here, everything sensitive comes from environment variables.
-# Local dev uses your `az login` session (authentication: CLI). CI uses a service principal.
+# No credentials in this file: dev uses the Azure CLI login, ci/prod read a service principal from environment variables.
 dunnhumby_promo:
   target: dev
   outputs:
