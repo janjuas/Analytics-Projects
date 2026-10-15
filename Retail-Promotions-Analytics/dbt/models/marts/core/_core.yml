@@ -36,3 +36,228 @@ models:
                 quote: false
       - name: product_size
         data_type: varchar(8000)
+
+  - name: dim_date
+    description: '{{ doc("dim_date") }}'
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: date_key
+        data_type: int
+        description: Study day number (1 = first day). Join key used by every fact.
+        data_tests: [unique, not_null]
+      - name: day_number
+        data_type: int
+      - name: calendar_date
+        data_type: date
+        description: Day 1 anchored on var('day_one_date'); the source itself has no calendar dates.
+        data_tests: [unique, not_null]
+      - name: week_number
+        data_type: int
+        description: Source WEEK_NO (1-102). Week 1 is days 1-5; later weeks start on days 6, 13, 20, ...
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+                max_value: 104
+      - name: week_start_date
+        data_type: date
+        description: Monday of the calendar week.
+      - name: day_of_week_number
+        data_type: int
+        description: 1 = Monday ... 7 = Sunday.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+                max_value: 7
+      - name: day_of_week_name
+        data_type: varchar(10)
+      - name: is_weekend
+        data_type: int
+      - name: month_number
+        data_type: int
+      - name: month_name
+        data_type: varchar(10)
+      - name: quarter_number
+        data_type: int
+      - name: calendar_year
+        data_type: int
+      - name: study_year
+        data_type: int
+        description: 1 for days 1-365, 2 afterwards. Use for year-on-year comparisons.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2]
+                quote: false
+      - name: is_in_transaction_window
+        data_type: int
+        description: 1 when the day is within the transaction history (campaigns run a few days beyond it).
+
+  - name: dim_household
+    description: '{{ doc("dim_household") }}'
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: household_sk
+        data_type: varchar(50)
+        description: Surrogate key (hash of household_id).
+        data_tests: [unique, not_null]
+      - name: household_id
+        data_type: int
+        description: Source household_key.
+        data_tests: [unique, not_null]
+      - name: has_demographics
+        data_type: int
+        description: 1 for the 801 households that shared demographics.
+      - name: age_band
+        data_type: varchar(50)
+        description: Age Group1-6 (ordinal); 'Unknown' without demographics.
+        data_tests: [not_null]
+      - name: marital_status_code
+        data_type: varchar(50)
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['X', 'Y', 'Z', 'Unknown']
+      - name: income_band
+        data_type: varchar(50)
+        description: Level1-12 (ordinal).
+      - name: household_size
+        data_type: varchar(50)
+        description: 1 to 5+.
+      - name: household_composition
+        data_type: varchar(50)
+        description: Group1-6 (ordinal).
+      - name: homeowner_status
+        data_type: varchar(50)
+      - name: children_band
+        data_type: varchar(50)
+        description: 1, 2, 3+ or None/Unknown.
+      - name: age_band_sort
+        data_type: int
+        description: Numeric order of age_band; 0 = Unknown. Use as the sort-by column in reports.
+      - name: income_band_sort
+        data_type: int
+      - name: household_size_sort
+        data_type: int
+      - name: household_composition_sort
+        data_type: int
+      - name: children_band_sort
+        data_type: int
+      - name: first_purchase_day
+        data_type: int
+      - name: last_purchase_day
+        data_type: int
+
+  - name: dim_store
+    description: '{{ doc("dim_store") }}'
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: store_sk
+        data_type: varchar(50)
+        data_tests: [unique, not_null]
+      - name: store_id
+        data_type: int
+        data_tests: [unique, not_null]
+      - name: has_promo_tracking
+        data_type: int
+        description: 1 for the 115 stores with display and mailer data in causal_data.
+      - name: first_trading_day
+        data_type: int
+      - name: last_trading_day
+        data_type: int
+      - name: panel_households
+        data_type: int
+        description: Panel households that shopped at the store.
+      - name: panel_sales_band
+        data_type: varchar(10)
+        description: Tercile of panel sales value (High / Medium / Low). Reflects panel spend, not store size.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['High', 'Medium', 'Low']
+
+  - name: dim_campaign
+    description: '{{ doc("dim_campaign") }}'
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: campaign_sk
+        data_type: varchar(50)
+        data_tests: [unique, not_null]
+      - name: campaign_id
+        data_type: int
+        data_tests: [unique, not_null]
+      - name: campaign_type
+        data_type: varchar(10)
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['TypeA', 'TypeB', 'TypeC']
+      - name: campaign_type_description
+        data_type: varchar(100)
+      - name: start_day_number
+        data_type: int
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: end_day_number
+        data_type: int
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: start_date
+        data_type: date
+        data_tests: [not_null]
+      - name: end_date
+        data_type: date
+        data_tests: [not_null]
+      - name: duration_days
+        data_type: int
+      - name: households_targeted
+        data_type: int
+      - name: coupons_in_pool
+        data_type: int
+        description: Distinct coupons in the campaign. For TypeA this is the pool each household's 16 coupons come from.
+      - name: eligible_products
+        data_type: int
+
+  - name: dim_display_location
+    description: In-store display locations (causal_data.display), from the dunnhumby user guide.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: display_code
+        data_type: varchar(1)
+        data_tests: [unique, not_null]
+      - name: display_location
+        data_type: varchar(60)
+      - name: is_on_display
+        data_type: int
+
+  - name: dim_mailer_location
+    description: Weekly mailer placements (causal_data.mailer), from the dunnhumby user guide.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: mailer_code
+        data_type: varchar(1)
+        data_tests: [unique, not_null]
+      - name: mailer_location
+        data_type: varchar(60)
+      - name: is_in_mailer
+        data_type: int

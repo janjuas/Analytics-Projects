@@ -62,7 +62,9 @@ models:
                 values: ['National', 'Private']
 
   - name: stg_silver__households
-    description: Demographics for the 801 households that shared them. Bands are anonymised in this copy of the dataset.
+    description: >
+      Demographics for the 801 households that shared them. Column names are inferred from the original public
+      release of the dataset; band values are anonymised but ordinal.
     columns:
       - name: household_key
         data_tests: [unique, not_null]

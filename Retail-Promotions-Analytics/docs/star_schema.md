@@ -1,16 +1,18 @@
 # Target star schema (gold, `wh_gold.marts`)
 
-Status: `dim_product` is built and tested (✅). The other models are planned, listed in build order.
+Status: all dimensions are built and tested (✅). Facts are planned, listed in build order.
 
 ## Dimensions
 
 | Model | Grain | Built from | Notes |
 |---|---|---|---|
-| `dim_date` | one row per study day (1–711) | generated (`dbt_utils.date_spine` or a numbers CTE) | `day_number`, `week_number`, a calendar date anchored on `var('day_one_date')`, day of week, month, is_weekend. The source has only day numbers. |
+| `dim_date` ✅ | study day (1–719) | numbers CTE, bounded by transactions, campaigns and redemptions | Day 1 anchored on a Wednesday so source weeks (starting day 6) run Monday–Sunday. `study_year`, `is_in_transaction_window`. |
 | `dim_product` ✅ | product_id | `stg_silver__products` | National vs private label, department > commodity > sub-commodity hierarchy. |
-| `dim_household` | household_key (all 2,500) | transactions ∪ demographics | Left-join demographics so the 1,699 households without them get `'Unknown'` bands rather than dropping out. `has_demographics` flag. This is where the CACI-style segmentation questions live. |
-| `dim_campaign` | campaign_id | `stg_silver__campaigns` | Type A/B/C, start/end day, duration, households targeted. |
-| `dim_store` | store_id | distinct stores in transactions + causal | No store attributes in the source. Derive size bands from sales. |
+| `dim_household` ✅ | household (all 2,500) | transactions, left-joined to demographics | 1,699 households without demographics keep `Unknown` bands and `has_demographics = 0`. Ordinal `*_sort` columns for reporting. |
+| `dim_campaign` ✅ | campaign_id (30) | campaigns, targeting, coupon pool, `dim_date` | Type A/B/C with descriptions from the user guide, start/end dates, households targeted, coupon pool size. |
+| `dim_store` ✅ | store_id (582) | transactions + causal | `has_promo_tracking` (115 stores) and a panel-spend tercile; the source has no store attributes. |
+| `dim_display_location` ✅ | display code | seed `display_location_codes` | Display location descriptions from the user guide. |
+| `dim_mailer_location` ✅ | mailer code | seed `mailer_location_codes` | Mailer placement descriptions from the user guide. |
 
 ## Facts
 

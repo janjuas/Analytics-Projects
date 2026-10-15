@@ -66,7 +66,7 @@ SPEC = {
         "keys": ["product_id"],
     },
     "hh_demographic": {
-        # this copy of the dataset anonymises five headers; mapping matches the dunnhumby user guide
+        # this copy anonymises five headers; names are inferred from the original public release (matching value sets)
         "columns": {
             "household_key":       ("household_key", "int"),
             "age_desc":            ("classification_1", "string"),
