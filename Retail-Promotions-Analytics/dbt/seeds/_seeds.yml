@@ -1,0 +1,22 @@
+version: 2
+
+seeds:
+  - name: display_location_codes
+    description: In-store display location codes for causal_data.display, from the dunnhumby user guide.
+    config:
+      column_types:
+        display_code: varchar(1)
+        display_location: varchar(60)
+    columns:
+      - name: display_code
+        data_tests: [unique, not_null]
+
+  - name: mailer_location_codes
+    description: Weekly mailer placement codes for causal_data.mailer, from the dunnhumby user guide.
+    config:
+      column_types:
+        mailer_code: varchar(1)
+        mailer_location: varchar(60)
+    columns:
+      - name: mailer_code
+        data_tests: [unique, not_null]

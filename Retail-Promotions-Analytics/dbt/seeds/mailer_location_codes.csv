@@ -1,0 +1,12 @@
+mailer_code,mailer_location
+0,Not on ad
+A,Interior page feature
+C,Interior page line item
+D,Front page feature
+F,Back page feature
+H,Wrap front feature
+J,Wrap interior coupon
+L,Wrap back feature
+P,Interior page coupon
+X,Free on interior page
+Z,"Free on front page, back page or wrap"

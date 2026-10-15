@@ -143,7 +143,7 @@ Running dbt locally against `wh_gold` (`dbt build` with `profiles.yml`) still wo
 
 ## Data quality notes
 
-- **`hh_demographic` headers are anonymised** in this copy: `classification_1..5`. Silver maps them back using the dunnhumby user guide: 1 = age, 2 = marital status (X/Y/Z), 3 = income (Level1–12), 4 = household size, 5 = household composition. The band values themselves stay anonymised.
+- **`hh_demographic` headers are anonymised** in this copy: `classification_1..5`. Silver gives them descriptive names inferred from the original public release of this dataset, whose value sets match: 1 = age, 2 = marital status (X/Y/Z), 3 = income (Level1–12), 4 = household size, 5 = household composition. The bundled user guide only describes them as ordinal segments, and the band values stay anonymised.
 - **Demographics cover only 801 of the 2,500 households.** Household analysis keeps the other 1,699 as `Unknown` rather than dropping them.
 - **`causal_data` has 15,245 product/store/week keys that appear twice with conflicting display/mailer codes** (0.04%). Silver keeps the row showing the most promotion exposure and writes the other to `lh_silver._rejects` with `reason = 'duplicate_key'`.
 - **Time is relative:** `DAY` 1–711 and `WEEK_NO` 1–102 have no calendar dates. Day 1 is anchored to a calendar date through `var('day_one_date')`.

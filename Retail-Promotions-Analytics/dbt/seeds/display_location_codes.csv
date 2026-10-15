@@ -1,0 +1,11 @@
+display_code,display_location
+0,Not on display
+1,Store front
+2,Store rear
+3,Front end cap
+4,Mid-aisle end cap
+5,Rear end cap
+6,Side-aisle end cap
+7,In-aisle
+9,Secondary location display
+A,In-shelf
