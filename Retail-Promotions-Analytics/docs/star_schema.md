@@ -1,6 +1,6 @@
 # Target star schema (gold, `wh_gold.marts`)
 
-`dim_product` is built as a worked example. Everything else below is the design to build next, in roughly this order.
+Status: `dim_product` is built and tested (✅). The other models are planned, listed in build order.
 
 ## Dimensions
 
@@ -30,7 +30,7 @@
 - **Demographic segments (CACI angle):** spend, basket size and promo sensitivity by income band × household composition.
 - **Private label share:** private vs. national share by department over time.
 
-## Tests to add as you go
+## Planned tests
 
 - `relationships` from every fact FK to its dimension.
 - `dbt_utils.expression_is_true`: basket totals equal the sum of their lines; discounts are ≤ 0.

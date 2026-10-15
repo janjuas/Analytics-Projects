@@ -1,7 +1,4 @@
-{#
-  Dev and prod are separate workspaces (separate wh_gold warehouses), so there is no need to prefix
-  schemas per environment. Use the folder's custom schema as-is: staging, intermediate, marts.
-#}
+{# Use each layer's schema name as-is (staging, marts). Dev and prod are separate warehouses, so no environment prefix. #}
 {% macro generate_schema_name(custom_schema_name, node) -%}
     {%- if custom_schema_name is none -%}
         {{ target.schema }}

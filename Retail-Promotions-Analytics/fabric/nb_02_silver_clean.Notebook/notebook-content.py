@@ -122,9 +122,9 @@ SPEC = {
             "mailer_code":  ("mailer", "string"),    # mailer placement code, 0 = none
         },
         "keys": ["product_id", "store_id", "week_no"],
-        # Source quirk: ~15k product/store/week keys (0.04%) appear twice with different codes.
-        # Rule: keep the row showing the most promo exposure; the loser goes to _rejects (reason = duplicate_key).
-        # expressions are sorted descending; first row per key wins
+        # 15,245 product/store/week keys (0.04%) appear twice with conflicting codes.
+        # Rule: keep the row with the most promo exposure (expressions below, descending);
+        # the other row goes to _rejects with reason = duplicate_key.
         "resolve_duplicates": [
             "(case when display_code <> '0' then 1 else 0 end) + (case when mailer_code <> '0' then 1 else 0 end)",
             "display_code",

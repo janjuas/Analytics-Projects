@@ -20,7 +20,7 @@
 
 # CELL ********************
 
-# Parameters (toggle as parameter cell to override from a pipeline)
+# Parameters (overridable from a pipeline)
 tables = ""          # comma-separated subset, e.g. "product,coupon"; empty = all folders under Files/raw
 bronze_lakehouse = "lh_bronze"
 

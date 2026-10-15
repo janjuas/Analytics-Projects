@@ -31,9 +31,6 @@ Fabric deployment pipeline promotes items from dev to prod.
 
 Dev SQL endpoint (Warehouse and both Lakehouses): `63lxcuql4fvu7iqtjpgd6no5fq-m7obfmaxqyaubhrmq7fc2hbezi.datawarehouse.fabric.microsoft.com`
 
-> The trial capacity started 2026-09-19 and normally lasts 60 days (around **2026-11-18**). Before then, either move the
-> workspaces to a paid F SKU or export what you need.
-
 ## Repo layout
 
 This project is the `Retail-Promotions-Analytics/` folder of
@@ -43,21 +40,22 @@ except the CI workflow, which GitHub requires at the repo root.
 ```
 dbt/                 dbt project (dbt-fabric). profiles.yml is committed and holds no secrets.
   models/staging/    1:1 views over lh_silver, renamed, with tests
-  models/marts/      star schema (dim_product is the worked example)
-fabric/              (created by Fabric Git sync) workspace items: notebooks, lakehouses, warehouse
+  models/marts/      star schema (dim_product built; roadmap in docs/star_schema.md)
+fabric/              Fabric workspace items, synced by Git integration: notebooks, lakehouses, warehouse, dbt job
 infra/               IDs + scripts: upload_raw.py, sync_dbt_job.py, create_deployment_pipeline.sh, connect_git.sh
-docs/star_schema.md  target model design + backlog of analyses and tests
+docs/star_schema.md  target model design, planned analyses and tests
 ../.github/workflows/retail-promotions-dbt.yml   CI: parse on every PR; on merge, publish to Fabric and run the dbt job
 ```
 
 ## Local setup
 
 ```bash
-python -m venv .venv && .venv/Scripts/pip install -r requirements.txt
-az login                                   # dbt dev target authenticates with your az session
+python -m venv .venv
+.venv/Scripts/pip install -r requirements.txt
+az login                                   # the dbt dev target authenticates with the Azure CLI session
 ```
 
-dbt-fabric also needs **Microsoft ODBC Driver 18 for SQL Server**. It is not installed on this machine yet:
+Running dbt locally also needs **Microsoft ODBC Driver 18 for SQL Server**:
 
 ```bash
 winget install --id Microsoft.msodbcsql.18 -e
@@ -86,7 +84,7 @@ be installed to build gold. The runtime uses dbt-core 1.11 and dbt-fabric 1.10, 
 | Command (`build` / `run` / `test`, select, exclude, threads) | job definition | `sync_dbt_job.py --operation/--select/...` or the UI |
 | Schedule | job's **Schedule** tab | Fabric UI |
 
-Things to know about the managed runtime (found the hard way):
+Runtime notes:
 - **Fabric marks a run "Failed" when dbt reports any warning**, even with `ERROR=0`. `sync_dbt_job.py --run` reads the run's `Output/<run id>/logs/dbt.log` and passes or fails on dbt's own `Done.` summary instead.
 - **No `persist_docs`**: Fabric Warehouse has no table or column comments, so it errors with `alter_column_comment macro not implemented`.
 - **Dot-folders break the project download.** The script skips them and uploads only the macros of `dbt_packages/`.
@@ -100,10 +98,8 @@ Things to know about the managed runtime (found the hard way):
 Models still build into `staging` and `marts` because of `macros/generate_schema_name.sql`. The profile schema
 (`Gold_DH`) is only used for anything without a custom schema.
 
-Why the project is in a Lakehouse and not uploaded into the job itself: the job rebuilds its own `Code/` folder
-from the editor's saved state, so files written there directly get wiped. A Lakehouse folder is a project source
-the job supports, and CI can write to it. Connecting the job straight to GitHub is the other supported route, but
-it would need `dbt_project.yml` at the repo root and a classic PAT.
+The project is published to a Lakehouse folder rather than edited inside the job, so CI can update it on every
+merge and Git stays the single source of truth.
 
 ## Re-loading data
 
@@ -112,9 +108,9 @@ it would need `dbt_project.yml` at the repo root and a classic PAT.
 ```
 Then run `nb_01_bronze_ingest` and `nb_02_silver_clean` in the dev workspace (both have a `tables` parameter for partial reloads).
 
-## Connect GitHub (one-off, in the browser)
+## GitHub integration (set-up)
 
-1. Turn on the tenant setting **Users can sync workspace items with GitHub repositories** (Admin portal → Tenant settings → Git integration). Make sure this folder is merged to `main` in `janjuas/Analytics-Projects`.
+1. Turn on the tenant setting **Users can sync workspace items with GitHub repositories** (Admin portal → Tenant settings → Git integration). `Retail-Promotions-Analytics/fabric` must exist on `main` in `janjuas/Analytics-Projects`.
 2. Create a fine-grained PAT scoped to `Analytics-Projects` with **Contents: Read and write**.
 3. In Fabric go to **Settings → Manage connections and gateways → New → Cloud → GitHub - Source control**, paste the PAT and save. Copy the connection ID.
 4. Run `bash infra/connect_git.sh <connection-id>`. This connects `dunnhumby-promo-dev` to `main:/Retail-Promotions-Analytics/fabric` and commits the workspace items.
@@ -145,10 +141,10 @@ The merge and manual jobs need a service principal:
 
 Running dbt locally against `wh_gold` (`dbt build` with `profiles.yml`) still works and needs ODBC Driver 18, see Local setup.
 
-## Data notes (things to know about this dataset)
+## Data quality notes
 
 - **`hh_demographic` headers are anonymised** in this copy: `classification_1..5`. Silver maps them back using the dunnhumby user guide: 1 = age, 2 = marital status (X/Y/Z), 3 = income (Level1–12), 4 = household size, 5 = household composition. The band values themselves stay anonymised.
-- **Demographics cover only 801 of the 2,500 households.** Model unknowns explicitly. Don't inner-join them away.
+- **Demographics cover only 801 of the 2,500 households.** Household analysis keeps the other 1,699 as `Unknown` rather than dropping them.
 - **`causal_data` has 15,245 product/store/week keys that appear twice with conflicting display/mailer codes** (0.04%). Silver keeps the row showing the most promotion exposure and writes the other to `lh_silver._rejects` with `reason = 'duplicate_key'`.
-- **Time is relative:** `DAY` 1–711 and `WEEK_NO` 1–102 have no calendar dates. `dim_date` anchors day 1 on `var('day_one_date')`.
+- **Time is relative:** `DAY` 1–711 and `WEEK_NO` 1–102 have no calendar dates. Day 1 is anchored to a calendar date through `var('day_one_date')`.
 - Discounts (`RETAIL_DISC`, `COUPON_DISC`, `COUPON_MATCH_DISC`) are stored as zero or negative numbers, except for **10 lines with a positive `RETAIL_DISC`**. Most are quantity-0 lines where the discount equals the sales value, which look like refunds or price corrections. The `accepted_range` test warns on them and fails only if there are more than 50.

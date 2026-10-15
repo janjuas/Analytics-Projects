@@ -3,8 +3,8 @@
 # /Retail-Promotions-Analytics/fabric on main, and commits the existing workspace items
 # (lakehouses, warehouse, notebooks, dbt job) into Git.
 #
-# Prereqs (one-off, done by you in the browser - see README "Connect GitHub"):
-#   1. The project folder is merged to `main` on GitHub.
+# Prerequisites (see README "Connect GitHub"):
+#   1. Retail-Promotions-Analytics/fabric exists on `main`.
 #   2. A Fabric "GitHub - Source control" connection exists (Settings > Manage connections and gateways),
 #      created with a fine-grained PAT that has Contents: Read and write on Analytics-Projects.
 #   3. Tenant setting "Users can sync workspace items with GitHub repositories" is enabled.

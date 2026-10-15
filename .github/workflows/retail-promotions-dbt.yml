@@ -21,7 +21,7 @@ on:
         default: build
 
 jobs:
-  # Every PR: no credentials needed. Catches broken refs, YAML and Jinja before review.
+  # Every PR: validates refs, YAML and Jinja without credentials.
   parse:
     runs-on: ubuntu-latest
     defaults:
@@ -40,9 +40,8 @@ jobs:
       - run: dbt deps
       - run: dbt parse
 
-  # Merge to main (or manual): publish dbt/ to the Lakehouse folder the Fabric dbt job reads from,
-  # then run the job in Fabric and fail this workflow if any model or test fails.
-  # Needs the service-principal secrets and FABRIC_CI_ENABLED=true (see README > CI secrets).
+  # Merge to main (or manual): publish dbt/ to Fabric, run the dbt job, fail on any model or test error.
+  # Requires the service-principal secrets and FABRIC_CI_ENABLED=true (see README > CI).
   fabric-dbt-job:
     needs: parse
     if: ${{ github.event_name != 'pull_request' && vars.FABRIC_CI_ENABLED == 'true' }}
