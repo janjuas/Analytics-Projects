@@ -153,9 +153,9 @@ def run_job(cfg: dict, poll_seconds: int = 15, timeout_minutes: int = 60) -> boo
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", default="dev", choices=["dev", "prod"])
-    parser.add_argument("--operation", choices=["build", "run", "test", "seed", "compile", "snapshot"])
-    parser.add_argument("--select")
-    parser.add_argument("--exclude")
+    parser.add_argument("--operation", default="build", choices=["build", "run", "test", "seed", "compile", "snapshot"])
+    parser.add_argument("--select", default="", help="applies to this invocation only; empty = whole project")
+    parser.add_argument("--exclude", default="")
     parser.add_argument("--threads", type=int)
     parser.add_argument("--skip-upload", action="store_true")
     parser.add_argument("--run", action="store_true", help="trigger the job after uploading and wait for the result")
@@ -178,11 +178,16 @@ def main() -> int:
         print(f"Mirrored {n} files to Lakehouse {lh} /{folder} ({removed} stale files removed)")
 
     command = content.setdefault("command", {"operation": "build", "arguments": {}})
+    # operation, select and exclude are set on every invocation so a selection never carries over to later runs
     wanted = dict(command)
     wanted["arguments"] = dict(command.get("arguments", {}))
-    if args.operation:
-        wanted["operation"] = args.operation
-    for key, value in (("select", args.select), ("exclude", args.exclude), ("threads", args.threads)):
+    wanted["operation"] = args.operation
+    if args.select:
+        wanted["arguments"]["select"] = args.select
+    else:
+        wanted["arguments"].pop("select", None)
+    wanted["arguments"]["exclude"] = args.exclude
+    for key, value in (("threads", args.threads),):
         if value is not None:
             wanted["arguments"][key] = value
     if wanted != command:

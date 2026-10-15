@@ -1,0 +1,193 @@
+version: 2
+
+# Acceptance tests for the analysis marts. A model is done when `dbt build --select <model>` passes them.
+# Tests run automatically once the model's `enabled=false` config is removed.
+
+models:
+  - name: promo_uplift_by_department
+    description: >
+      Average weekly units for the same product and store in promoted vs. non-promoted weeks, by department
+      and promotion type. Compares weeks in which the product sold, because non-promoted weeks without
+      sales are not recorded in the source. Limited to the 115 promo-tracked stores, weeks 9-101.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [department, promo_type]
+    columns:
+      - name: department
+        data_tests: [not_null]
+      - name: promo_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Display only', 'Mailer only', 'Display + mailer']
+      - name: product_store_pairs
+        description: Product-store pairs with both promoted and baseline weeks of this type.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+      - name: promoted_weeks
+      - name: baseline_weeks
+      - name: avg_units_promoted
+        description: Average units in promoted weeks with sales.
+        data_tests: [not_null]
+      - name: avg_units_baseline
+        description: Average units in non-promoted weeks with sales, for the same product-store pairs.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                inclusive: false
+      - name: uplift_pct
+        description: avg_units_promoted / avg_units_baseline - 1 (0.25 = +25%).
+        data_tests: [not_null]
+
+  - name: discount_depth_response
+    description: >
+      Units per line by loyalty-discount depth band, for commodities with at least 1,000 lines.
+      Depth = loyalty discount / shelf value.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [commodity, discount_depth_band]
+    columns:
+      - name: department
+      - name: commodity
+        data_tests: [not_null]
+      - name: discount_depth_band
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['No discount', '1-10%', '10-20%', '20-30%', '30%+']
+      - name: discount_depth_band_sort
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 4
+      - name: lines
+      - name: units
+      - name: avg_units_per_line
+        data_tests: [not_null]
+      - name: avg_shelf_unit_price
+      - name: avg_paid_unit_price
+      - name: units_share_of_commodity
+        description: Share of the commodity's units sold in this band.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+  - name: campaign_effect
+    description: >
+      Difference-in-differences per campaign: change in average sales per household from the
+      before-window to the campaign window, targeted households minus non-targeted households that
+      shopped in the before-window. Campaigns running past the last transaction day are excluded.
+    columns:
+      - name: campaign_id
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_campaign')
+                field: campaign_id
+      - name: campaign_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['TypeA', 'TypeB', 'TypeC']
+      - name: households_targeted
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+      - name: households_control
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+      - name: avg_sales_before_targeted
+      - name: avg_sales_during_targeted
+      - name: avg_sales_before_control
+      - name: avg_sales_during_control
+      - name: did_per_household
+        description: (during - before) for targeted minus (during - before) for control, in sales value.
+        data_tests: [not_null]
+      - name: did_pct
+        description: did_per_household relative to the targeted households' before-window average.
+      - name: redemption_rate
+        description: Share of targeted households that redeemed at least one coupon.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+  - name: household_segment_summary
+    description: >
+      Shopping behaviour by income band x household composition, plus an 'Unknown' row for the 1,699
+      households without demographics. Per-household figures are averaged per household, not per basket.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [income_band, household_composition]
+    columns:
+      - name: income_band
+        data_tests: [not_null]
+      - name: income_band_sort
+      - name: household_composition
+        data_tests: [not_null]
+      - name: household_composition_sort
+      - name: households
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+      - name: baskets
+      - name: baskets_per_household
+      - name: avg_basket_value
+      - name: sales_per_household
+      - name: loyalty_discount_share
+        description: Loyalty discount / shelf value across the segment's baskets (promotion sensitivity).
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: coupon_basket_share
+        description: Share of baskets using a manufacturer coupon.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: is_small_segment
+        description: 1 when the segment has fewer than 10 households; treat its figures with caution.
+
+  - name: private_label_share
+    description: >
+      Private-label share of sales value by department, study year 1 vs. year 2, for departments with
+      at least 1,000 sales value in each year.
+    columns:
+      - name: department
+        data_tests: [unique, not_null]
+      - name: sales_value_y1
+      - name: sales_value_y2
+      - name: private_share_y1
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: private_share_y2
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: share_change_pp
+        description: Change in private-label share from year 1 to year 2, in percentage points.

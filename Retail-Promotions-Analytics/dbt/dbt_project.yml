@@ -24,6 +24,8 @@ models:
     marts:
       +schema: marts
       +materialized: table
+      analysis:
+        +schema: analysis
 
 seeds:
   dunnhumby_promo:

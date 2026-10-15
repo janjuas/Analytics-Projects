@@ -26,7 +26,11 @@ Status: the full star schema is built and tested (✅): 8 dimensions, 5 facts, 2
 
 Supporting dimension: `dim_week` ✅ (103 weeks, with `is_promo_tracked_week`) for the weekly fact.
 
-## Marts (analytics questions to answer)
+## Analysis marts (`wh_gold.analysis`)
+
+Templates with steps, traps and acceptance tests are in `dbt/models/marts/analysis/`. Each model starts
+disabled; remove its `config(enabled=false)` line when it is written.
+
 
 - **Promotion uplift:** weekly unit sales when a product is on display or in the mailer vs. when it isn't, by department.
 - **Price elasticity / discount depth:** sales response to `retail_discount` depth by commodity.

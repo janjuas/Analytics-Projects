@@ -93,7 +93,10 @@ Runtime notes:
 ```bash
 .venv/Scripts/python infra/sync_dbt_job.py          # publish dbt/ to the Lakehouse folder
 .venv/Scripts/python infra/sync_dbt_job.py --run    # publish, run the job in Fabric, wait, exit 1 on failure
+.venv/Scripts/python infra/sync_dbt_job.py --run --select campaign_effect   # build and test one model
 ```
+
+`--select` applies to that run only; the next run without it builds the whole project again.
 
 Models still build into `staging` and `marts` because of `macros/generate_schema_name.sql`. The profile schema
 (`Gold_DH`) is only used for anything without a custom schema.
