@@ -1,14 +1,14 @@
 version: 2
 
-# Acceptance tests for the analysis marts. A model is done when `dbt build --select <model>` passes them.
-# Tests run automatically once the model's `enabled=false` config is removed.
+# Analysis marts. All use merchandise only (dim_product.is_merchandise = 1) unless noted.
 
 models:
   - name: promo_uplift_by_department
     description: >
       Average weekly units for the same product and store in promoted vs. non-promoted weeks, by department
       and promotion type. Compares weeks in which the product sold, because non-promoted weeks without
-      sales are not recorded in the source. Limited to the 115 promo-tracked stores, weeks 9-101.
+      sales are not recorded in the source. Limited to the 115 promo-tracked stores, weeks 9-101, and to
+      product-store pairs with both promoted and baseline weeks.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -46,12 +46,13 @@ models:
 
   - name: discount_depth_response
     description: >
-      Units per line by loyalty-discount depth band, for commodities with at least 1,000 lines.
-      Depth = loyalty discount / shelf value.
+      Units per line by loyalty-discount depth band, for department-commodity pairs with at least 1,000
+      lines. Depth = loyalty discount / shelf value. Grain includes department because some commodity
+      names appear under several departments.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
-            combination_of_columns: [commodity, discount_depth_band]
+            combination_of_columns: [department, commodity, discount_depth_band]
     columns:
       - name: department
       - name: commodity
@@ -85,7 +86,9 @@ models:
     description: >
       Difference-in-differences per campaign: change in average sales per household from the
       before-window to the campaign window, targeted households minus non-targeted households that
-      shopped in the before-window. Campaigns running past the last transaction day are excluded.
+      shopped in the before-window. Controls are matched on before-window spend quintile, because
+      targeted households spend about twice as much as the rest. Campaigns running past the last
+      transaction day are excluded.
     columns:
       - name: campaign_id
         data_tests:
@@ -101,11 +104,15 @@ models:
               arguments:
                 values: ['TypeA', 'TypeB', 'TypeC']
       - name: households_targeted
+        description: Every household targeted by the campaign.
         data_tests:
           - dbt_utils.accepted_range:
               arguments:
                 min_value: 1
+      - name: households_targeted_active
+        description: Targeted households that shopped in the before-window; the targeted averages use these.
       - name: households_control
+        description: Non-targeted households that shopped in the before-window.
         data_tests:
           - dbt_utils.accepted_range:
               arguments:
@@ -115,10 +122,14 @@ models:
       - name: avg_sales_before_control
       - name: avg_sales_during_control
       - name: did_per_household
-        description: (during - before) for targeted minus (during - before) for control, in sales value.
+        description: >
+          Spend-matched estimate: (during - before) for targeted minus (during - before) for control,
+          within before-window spend quintiles, weighted by targeted households per quintile.
         data_tests: [not_null]
       - name: did_pct
         description: did_per_household relative to the targeted households' before-window average.
+      - name: did_per_household_unmatched
+        description: The same comparison against all active non-targeted households, without matching.
       - name: redemption_rate
         description: Share of targeted households that redeemed at least one coupon.
         data_tests:
@@ -126,11 +137,14 @@ models:
               arguments:
                 min_value: 0
                 max_value: 1
+      - name: is_small_campaign
+        description: 1 when fewer than 30 targeted households were active; treat the estimate with caution.
 
   - name: household_segment_summary
     description: >
       Shopping behaviour by income band x household composition, plus an 'Unknown' row for the 1,699
       households without demographics. Per-household figures are averaged per household, not per basket.
+      Uses all basket spend, including fuel and other non-merchandise lines.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:

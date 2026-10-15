@@ -1,6 +1,4 @@
 -- households_targeted per campaign must match fct_campaign_targeting for complete-window campaigns.
--- Enable together with campaign_effect by deleting the config line.
-{{ config(enabled=false) }}
 
 with expected as (
     select c.campaign_id, count(*) as households_targeted
