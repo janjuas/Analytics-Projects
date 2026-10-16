@@ -3,17 +3,17 @@ table Sales
 
 	/// Amount the retailer received, after loyalty discount and coupon match.
 	measure 'Total Sales Value' = SUM(Sales[Sales Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Sales
 
 	/// Value at regular shelf price, before loyalty discount and coupon match.
 	measure 'Total Shelf Value' = SUM(Sales[Shelf Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Sales
 
 	/// Amount customers paid, after manufacturer coupons.
 	measure 'Customer Paid' = SUM(Sales[Customer Paid Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Sales
 
 	/// Units sold. Filter Product[Is Merchandise] = 1 to exclude fuel, which is recorded in gallons.
@@ -33,12 +33,12 @@ table Sales
 
 	/// Loyalty-card discount given, as a positive amount.
 	measure 'Loyalty Discount' = SUM(Sales[Loyalty Discount Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Discounts
 
 	/// Manufacturer coupon discount used, as a positive amount.
 	measure 'Coupon Discount' = SUM(Sales[Coupon Discount Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Discounts
 
 	/// Loyalty discount as a share of shelf value (discount depth).
