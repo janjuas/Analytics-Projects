@@ -12,3 +12,5 @@ from its **Source control** panel, or edit on a branch and use **Update all** af
 | `nb_01_bronze_ingest` | Notebook | CSV → `raw_*` Delta |
 | `nb_02_silver_clean` | Notebook | `raw_*` → typed silver, duplicate-key resolution, `_rejects` |
 | `dbt_promo_star_schema` | dbt job | runs `../dbt` (published to `lh_silver/Files/dbt`) against `wh_gold` |
+| `Retail Promotions` | Semantic model | Direct Lake model over `wh_gold` marts and analysis tables |
+| `Retail Promotions Analysis` | Report | 5-page report on the semantic model |

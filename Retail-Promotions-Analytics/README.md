@@ -27,6 +27,8 @@ Fabric deployment pipeline promotes items from dev to prod.
 | Notebook | `nb_01_bronze_ingest` | `34d77549-2c09-4864-bdee-d1cd16898462` |
 | Notebook | `nb_02_silver_clean` | `891a9c48-45c0-412f-a049-4f812b5e1a17` |
 | dbt job | `dbt_promo_star_schema` (project: `lh_silver/Files/dbt`, target: `wh_gold`) | `7c1b6a07-ed63-4da8-b1db-8af767a994e6` |
+| Semantic model | `Retail Promotions` (Direct Lake on `wh_gold`) | `1eecc8d6-15dd-4bbb-b842-e06faf4996d1` |
+| Report | `Retail Promotions Analysis` (5 pages) | `102e25f6-04fb-4fbf-ae4c-98ccd248cf06` |
 | Deployment pipeline | `dunnhumby-promo` (Development → Production) | `d8db794c-f708-49c4-b9e9-a0585bf5ca7a` |
 
 Dev SQL endpoint (Warehouse and both Lakehouses): `63lxcuql4fvu7iqtjpgd6no5fq-m7obfmaxqyaubhrmq7fc2hbezi.datawarehouse.fabric.microsoft.com`
@@ -103,6 +105,26 @@ Models still build into `staging` and `marts` because of `macros/generate_schema
 
 The project is published to a Lakehouse folder rather than edited inside the job, so CI can update it on every
 merge and Git stays the single source of truth.
+
+## Power BI report
+
+`Retail Promotions Analysis` is a thin report on the `Retail Promotions` semantic model, which reads `wh_gold`
+in **Direct Lake** mode (no import or scheduled refresh; it reads the Warehouse's Delta tables directly).
+Both are in `fabric/` and versioned through Fabric Git integration.
+
+**Model:** 18 tables (5 facts, 8 dimensions, 5 analysis tables), 19 single-direction relationships, 42 measures
+with formats, descriptions and display folders. Keys, sort columns and raw numeric columns are hidden behind
+measures. `Date` is the marked date table and filters `Week`, so one week slicer filters daily and weekly facts.
+
+| Page | Question it answers | Main visuals |
+|---|---|---|
+| Overview | Headline performance | 6 KPIs, weekly sales, top 10 departments |
+| Promotions | Which mechanic earns its place, and where | Uplift by mechanic; department x mechanic matrix (cells with 100+ product-store pairs) |
+| Discounts and Private Label | Are discounts deep enough; is own-label growing | Units per line by depth band; private-label share year 1 vs 2 |
+| Campaigns | Did campaigns lift spend against comparable households | Matched vs unmatched lift by campaign type; campaign detail |
+| Customers | Which segments are most valuable and promotion-sensitive | Sales per household matrix (income x composition); coupon use by income |
+
+Each page states its main caveat in the subtitle. Product-level pages are filtered to merchandise.
 
 ## Re-loading data
 
