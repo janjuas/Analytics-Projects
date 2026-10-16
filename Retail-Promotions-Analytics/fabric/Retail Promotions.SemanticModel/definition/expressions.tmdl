@@ -1,6 +1,6 @@
 expression 'DirectLake - Retail Promotions' =
 		let
-		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/b012dc67-8617-4001-9e2c-87ca2d1c24ca/f2e91e90-11a1-4eed-8d5d-b2c59e034c22", [HierarchicalNavigation=true])
+		    database = Sql.Database("63lxcuql4fvu7iqtjpgd6no5fq-m7obfmaxqyaubhrmq7fc2hbezi.datawarehouse.fabric.microsoft.com", "f2e91e90-11a1-4eed-8d5d-b2c59e034c22")
 		in
-		    Source
+		    database
 
