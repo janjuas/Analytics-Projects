@@ -131,7 +131,16 @@ models:
                 values: ['X', 'Y', 'Z', 'Unknown']
       - name: income_band
         data_type: varchar(50)
-        description: Level1-12 (ordinal).
+        description: Annual household income range (Under 15K to 250K+, see seed income_band_ranges); 'Unknown' without demographics.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Under 15K', '15-24K', '25-34K', '35-49K', '50-74K', '75-99K', '100-124K', '125-149K',
+                         '150-174K', '175-199K', '200-249K', '250K+', 'Unknown']
+      - name: income_level
+        data_type: varchar(50)
+        description: The anonymised income level as delivered (Level1-12, ordinal).
       - name: household_size
         data_type: varchar(50)
         description: 1 to 5+.

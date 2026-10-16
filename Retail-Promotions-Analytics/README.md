@@ -50,9 +50,10 @@ everyone else, so each campaign is measured against households with similar spen
 A simple comparison against all non-targeted households shows only £2.51 per household and would have undervalued
 the campaigns.
 
-**5. Higher income bands spend more and use more coupons.** Income Levels 7–9 spend £7,000–8,250 per household over
-the two years, against £4,100–5,500 for Levels 1–4. Coupons are used on 9–11% of trips at Levels 5, 6, 8 and 9, and on
-about 6% at Levels 1–4; Level 7 is the exception at 5.3%. The top bands hold 12–29 households each, so treat band-level differences as directional.
+**5. Higher-income households spend more and use more coupons.** Households earning 100–174K a year spend
+£7,000–8,250 each over the two years, against £4,100–5,500 for households under 50K. Coupons are used on 9–11% of
+trips in the 50–99K and 125–174K bands and on about 6% under 50K; the 100–124K band is the exception at 5.3%. Bands
+above 100K hold 12–29 households each, so treat band-level differences as directional.
 
 ## Recommendations
 
@@ -99,6 +100,8 @@ model design: [star schema](docs/star_schema.md).
 
 - The data has relative days and weeks, not calendar dates; day 1 is anchored to a date only to draw timelines.
 - Only 801 of the 2,500 households have demographics. The rest are kept as "Unknown" rather than dropped.
+- The dataset gives income as anonymised levels 1–12. The ranges shown are the bands of the dataset's original public
+  release; the number of households in each level matches that release band for band.
 - Campaign results are an observational estimate, not a randomised test.
 - In 0.04% of promotion records the same product, store and week had conflicting codes; the row with the most
   promotion was kept and the other logged.
