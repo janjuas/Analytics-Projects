@@ -28,7 +28,8 @@ Supporting dimension: `dim_week` ✅ (103 weeks, with `is_promo_tracked_week`) f
 
 ## Analysis marts (`wh_gold.analysis`)
 
-Built in `dbt/models/marts/analysis/`, merchandise only (`dim_product.is_merchandise`):
+Built in `dbt/models/marts/analysis/`, merchandise only (`dim_product.is_merchandise`), and surfaced in the
+`Retail Promotions Analysis` Power BI report:
 `promo_uplift_by_department`, `discount_depth_response`, `campaign_effect`, `household_segment_summary`,
 `private_label_share`.
 
