@@ -1,0 +1,21 @@
+/// Weekly mailer placement codes from the dunnhumby user guide.
+table 'Mailer Location'
+
+	column 'Mailer Code'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: mailer_code
+
+	column 'Mailer Location'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: mailer_location
+
+	partition 'Mailer Location' = entity
+		mode: directLake
+		source
+			entityName: dim_mailer_location
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

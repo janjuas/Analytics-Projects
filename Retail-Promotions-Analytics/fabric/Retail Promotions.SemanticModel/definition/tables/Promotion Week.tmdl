@@ -1,0 +1,80 @@
+/// One row per product, store and week for the 115 promo-tracked stores, weeks 9-101. Promoted weeks come from display/mailer data; non-promoted weeks with sales are the baseline.
+table 'Promotion Week'
+
+	/// Units sold in tracked product-store-weeks.
+	measure 'Promotion Week Units' = SUM('Promotion Week'[Week Units Sold])
+		formatString: #,##0
+		displayFolder: Promotions
+
+	/// Sales value in tracked product-store-weeks.
+	measure 'Promotion Week Sales' = SUM('Promotion Week'[Week Sales Value])
+		formatString: $#,##0
+		displayFolder: Promotions
+
+	/// Number of tracked product-store-weeks.
+	measure 'Product Store Weeks' = COUNTROWS('Promotion Week')
+		formatString: #,##0
+		displayFolder: Promotions
+
+	/// Product-store-weeks with a display or mailer feature.
+	measure 'Promoted Weeks' = CALCULATE([Product Store Weeks], 'Promotion Week'[Is Promoted] = 1)
+		formatString: #,##0
+		displayFolder: Promotions
+
+	column 'Product Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: product_sk
+
+	column 'Store Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: store_sk
+
+	column 'Week Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: week_number
+
+	column 'Display Code'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: display_code
+
+	column 'Mailer Code'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: mailer_code
+
+	/// 1 when the product was on display or in the mailer that week.
+	column 'Is Promoted'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: is_promoted
+
+	column 'Week Units Sold'
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: units_sold
+
+	column 'Week Sales Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: sales_value
+
+	partition 'Promotion Week' = entity
+		mode: directLake
+		source
+			entityName: fct_promo_exposure_weekly
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

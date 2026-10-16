@@ -1,0 +1,76 @@
+relationship 'Sales to Date Date Key'
+	fromColumn: Sales.'Date Key'
+	toColumn: Date.'Date Key'
+
+relationship 'Sales to Household Household Key'
+	fromColumn: Sales.'Household Key'
+	toColumn: Household.'Household Key'
+
+relationship 'Sales to Product Product Key'
+	fromColumn: Sales.'Product Key'
+	toColumn: Product.'Product Key'
+
+relationship 'Sales to Store Store Key'
+	fromColumn: Sales.'Store Key'
+	toColumn: Store.'Store Key'
+
+relationship 'Basket to Date Date Key'
+	fromColumn: Basket.'Date Key'
+	toColumn: Date.'Date Key'
+
+relationship 'Basket to Household Household Key'
+	fromColumn: Basket.'Household Key'
+	toColumn: Household.'Household Key'
+
+relationship 'Basket to Store Store Key'
+	fromColumn: Basket.'Store Key'
+	toColumn: Store.'Store Key'
+
+relationship 'Promotion Week to Product Product Key'
+	fromColumn: 'Promotion Week'.'Product Key'
+	toColumn: Product.'Product Key'
+
+relationship 'Promotion Week to Store Store Key'
+	fromColumn: 'Promotion Week'.'Store Key'
+	toColumn: Store.'Store Key'
+
+relationship 'Promotion Week to Week Week Number'
+	fromColumn: 'Promotion Week'.'Week Number'
+	toColumn: Week.'Week Number'
+
+relationship 'Promotion Week to Display Location Display Code'
+	fromColumn: 'Promotion Week'.'Display Code'
+	toColumn: 'Display Location'.'Display Code'
+
+relationship 'Promotion Week to Mailer Location Mailer Code'
+	fromColumn: 'Promotion Week'.'Mailer Code'
+	toColumn: 'Mailer Location'.'Mailer Code'
+
+relationship 'Campaign Targeting to Household Household Key'
+	fromColumn: 'Campaign Targeting'.'Household Key'
+	toColumn: Household.'Household Key'
+
+relationship 'Campaign Targeting to Campaign Campaign Key'
+	fromColumn: 'Campaign Targeting'.'Campaign Key'
+	toColumn: Campaign.'Campaign Key'
+
+relationship 'Coupon Redemption to Household Household Key'
+	fromColumn: 'Coupon Redemption'.'Household Key'
+	toColumn: Household.'Household Key'
+
+relationship 'Coupon Redemption to Campaign Campaign Key'
+	fromColumn: 'Coupon Redemption'.'Campaign Key'
+	toColumn: Campaign.'Campaign Key'
+
+relationship 'Coupon Redemption to Date Date Key'
+	fromColumn: 'Coupon Redemption'.'Date Key'
+	toColumn: Date.'Date Key'
+
+relationship 'Date to Week Week Number'
+	fromColumn: Date.'Week Number'
+	toColumn: Week.'Week Number'
+
+relationship 'Campaign Effect to Campaign Campaign ID'
+	fromColumn: 'Campaign Effect'.'Campaign ID'
+	toColumn: Campaign.'Campaign ID'
+

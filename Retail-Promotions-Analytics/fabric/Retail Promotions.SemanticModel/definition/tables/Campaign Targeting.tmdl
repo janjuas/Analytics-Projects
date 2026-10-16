@@ -1,0 +1,69 @@
+/// One row per household targeted by a campaign (7,208), with redemptions and sales before and during the campaign.
+table 'Campaign Targeting'
+
+	/// Household-campaign targeting records.
+	measure 'Targeted Households' = COUNTROWS('Campaign Targeting')
+		formatString: #,##0
+		displayFolder: Campaigns
+
+	/// Coupons redeemed by targeted households.
+	measure 'Coupons Redeemed Total' = SUM('Campaign Targeting'[Coupons Redeemed])
+		formatString: #,##0
+		displayFolder: Campaigns
+
+	/// Share of targeted households that redeemed at least one coupon.
+	measure 'Redemption Rate %' = DIVIDE(CALCULATE([Targeted Households], 'Campaign Targeting'[Has Redeemed] = 1), [Targeted Households])
+		formatString: 0.0%
+		displayFolder: Campaigns
+
+	column 'Household Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: household_sk
+
+	column 'Campaign Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: campaign_sk
+
+	column 'Coupons Redeemed'
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: coupons_redeemed
+
+	/// 1 when the household redeemed at least one coupon from the campaign.
+	column 'Has Redeemed'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: has_redeemed
+
+	column 'Sales During Campaign'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: sales_during_campaign
+
+	column 'Sales Before Campaign'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: sales_before_campaign
+
+	/// 0 when the campaign runs past the last transaction day.
+	column 'Is Window Complete'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: is_window_complete
+
+	partition 'Campaign Targeting' = entity
+		mode: directLake
+		source
+			entityName: fct_campaign_targeting
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

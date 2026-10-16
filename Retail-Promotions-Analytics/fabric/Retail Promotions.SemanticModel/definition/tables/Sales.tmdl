@@ -1,0 +1,135 @@
+/// One row per product line in a basket (2.6M). Shelf value is the regular price before the loyalty discount and coupon match; customer paid is after any manufacturer coupon.
+table Sales
+
+	/// Amount the retailer received, after loyalty discount and coupon match.
+	measure 'Total Sales Value' = SUM(Sales[Sales Value])
+		formatString: $#,##0
+		displayFolder: Sales
+
+	/// Value at regular shelf price, before loyalty discount and coupon match.
+	measure 'Total Shelf Value' = SUM(Sales[Shelf Value])
+		formatString: $#,##0
+		displayFolder: Sales
+
+	/// Amount customers paid, after manufacturer coupons.
+	measure 'Customer Paid' = SUM(Sales[Customer Paid Value])
+		formatString: $#,##0
+		displayFolder: Sales
+
+	/// Units sold. Filter Product[Is Merchandise] = 1 to exclude fuel, which is recorded in gallons.
+	measure 'Units Sold' = SUM(Sales[Quantity])
+		formatString: #,##0
+		displayFolder: Sales
+
+	/// Number of product lines purchased.
+	measure 'Sales Lines' = COUNTROWS(Sales)
+		formatString: #,##0
+		displayFolder: Sales
+
+	/// Households with at least one purchase in the current filter context.
+	measure 'Shopping Households' = DISTINCTCOUNT(Sales[Household Key])
+		formatString: #,##0
+		displayFolder: Sales
+
+	/// Loyalty-card discount given, as a positive amount.
+	measure 'Loyalty Discount' = SUM(Sales[Loyalty Discount Value])
+		formatString: $#,##0
+		displayFolder: Discounts
+
+	/// Manufacturer coupon discount used, as a positive amount.
+	measure 'Coupon Discount' = SUM(Sales[Coupon Discount Value])
+		formatString: $#,##0
+		displayFolder: Discounts
+
+	/// Loyalty discount as a share of shelf value (discount depth).
+	measure 'Loyalty Discount %' = DIVIDE([Loyalty Discount], [Total Shelf Value])
+		formatString: 0.0%
+		displayFolder: Discounts
+
+	/// Share of sales value from retailer private-label products.
+	measure 'Private Label Share %' = DIVIDE(CALCULATE([Total Sales Value], Product[Brand Type] = "Private"), [Total Sales Value])
+		formatString: 0.0%
+		displayFolder: Sales
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column 'Household Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: household_sk
+
+	column 'Product Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: product_sk
+
+	column 'Store Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: store_sk
+
+	column Quantity
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: quantity
+
+	column 'Shelf Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: shelf_value
+
+	column 'Sales Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: sales_value
+
+	column 'Customer Paid Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: customer_paid_value
+
+	column 'Loyalty Discount Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: loyalty_discount_value
+
+	column 'Coupon Discount Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: coupon_discount_value
+
+	/// 1 when the line received a loyalty-card discount.
+	column 'Has Loyalty Discount'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: has_loyalty_discount
+
+	/// 1 when a manufacturer coupon was used on the line.
+	column 'Has Coupon'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: has_coupon
+
+	partition Sales = entity
+		mode: directLake
+		source
+			entityName: fct_sales_line
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

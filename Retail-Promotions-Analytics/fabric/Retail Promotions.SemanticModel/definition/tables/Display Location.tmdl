@@ -1,0 +1,21 @@
+/// In-store display location codes from the dunnhumby user guide.
+table 'Display Location'
+
+	column 'Display Code'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: display_code
+
+	column 'Display Location'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: display_location
+
+	partition 'Display Location' = entity
+		mode: directLake
+		source
+			entityName: dim_display_location
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

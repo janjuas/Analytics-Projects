@@ -1,0 +1,103 @@
+/// Study calendar, one row per study day (1-719). Day 1 is anchored on Wednesday 3 Jan 2018; the source has day numbers only.
+table Date
+	dataCategory: Time
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: dd mmm yyyy
+		summarizeBy: none
+		sourceColumn: calendar_date
+
+	/// Source DAY, 1-719.
+	column 'Study Day'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: day_number
+
+	/// Source WEEK_NO.
+	column 'Week Number'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: week_number
+
+	column 'Week Start'
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		summarizeBy: none
+		sourceColumn: week_start_date
+
+	column 'Day of Week Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: day_of_week_number
+
+	column 'Day of Week'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: day_of_week_name
+		sortByColumn: 'Day of Week Number'
+
+	column 'Is Weekend'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+	column 'Month Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: month_number
+
+	column Month
+		dataType: string
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: 'Month Number'
+
+	column Quarter
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: quarter_number
+
+	column Year
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: calendar_year
+
+	/// 1 for days 1-365, 2 afterwards.
+	column 'Study Year'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: study_year
+
+	/// 1 for days with transaction history (1-711).
+	column 'In Transaction Window'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: is_in_transaction_window
+
+	partition Date = entity
+		mode: directLake
+		source
+			entityName: dim_date
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

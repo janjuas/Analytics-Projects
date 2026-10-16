@@ -1,0 +1,127 @@
+{
+  "name": "matched-vs-unmatched",
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "queryRef": "Campaign.Campaign Type",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign"
+                    }
+                  },
+                  "Property": "Campaign Type"
+                }
+              },
+              "nativeQueryRef": "Campaign Type",
+              "displayName": "Type"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "queryRef": "Campaign Effect.Lift per Household",
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Lift per Household"
+                }
+              },
+              "nativeQueryRef": "Lift per Household",
+              "displayName": "Matched lift"
+            },
+            {
+              "queryRef": "Campaign Effect.Unmatched Lift per Household",
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Unmatched Lift per Household"
+                }
+              },
+              "nativeQueryRef": "Unmatched Lift per Household",
+              "displayName": "Unmatched lift"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Campaign"
+                  }
+                },
+                "Property": "Campaign Type"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {},
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Lift per household: matched vs unmatched controls'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "position": {
+    "x": 24,
+    "y": 288,
+    "width": 500,
+    "height": 408,
+    "z": 0,
+    "tabOrder": 0
+  },
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json"
+}

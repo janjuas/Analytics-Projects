@@ -7,6 +7,7 @@ CREATE TABLE [marts].[dim_product] (
     [sub_commodity]    VARCHAR (8000) NULL,
     [brand_type]       VARCHAR (8000) NULL,
     [is_private_label] INT            NULL,
+    [is_merchandise]   INT            NULL,
     [product_size]     VARCHAR (8000) NULL
 );
 

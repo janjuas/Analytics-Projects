@@ -1,0 +1,55 @@
+/// Pre-aggregated: units per line by loyalty-discount depth band, by department and commodity (merchandise only, >= 1,000 lines).
+table 'Discount Depth'
+
+	/// Average units bought per line in the band.
+	measure 'Units per Line' = DIVIDE(SUM('Discount Depth'[Units]), SUM('Discount Depth'[Lines]))
+		formatString: #,##0.00
+		displayFolder: Discount Depth
+
+	/// Share of units sold in each depth band.
+	measure 'Band Units %' = DIVIDE(SUM('Discount Depth'[Units]), CALCULATE(SUM('Discount Depth'[Units]), REMOVEFILTERS('Discount Depth'[Discount Depth Band], 'Discount Depth'[Discount Depth Band Sort])))
+		formatString: 0.0%
+		displayFolder: Discount Depth
+
+	column Department
+		dataType: string
+		summarizeBy: none
+		sourceColumn: department
+
+	column Commodity
+		dataType: string
+		summarizeBy: none
+		sourceColumn: commodity
+
+	column 'Discount Depth Band'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: discount_depth_band
+		sortByColumn: 'Discount Depth Band Sort'
+
+	column 'Discount Depth Band Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: discount_depth_band_sort
+
+	column Lines
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: lines
+
+	column Units
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: units
+
+	partition 'Discount Depth' = entity
+		mode: directLake
+		source
+			entityName: discount_depth_response
+			schemaName: analysis
+			expressionSource: 'DirectLake - Retail Promotions'
+

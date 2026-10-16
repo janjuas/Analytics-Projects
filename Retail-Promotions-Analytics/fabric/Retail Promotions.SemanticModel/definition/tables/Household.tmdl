@@ -1,0 +1,99 @@
+/// One row per household (2,500). The 1,699 households without demographics have Unknown bands.
+table Household
+
+	/// Households in the panel.
+	measure 'Household Count' = COUNTROWS(Household)
+		formatString: #,##0
+		displayFolder: Households
+
+	column 'Household Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: household_sk
+
+	column 'Has Demographics'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: has_demographics
+
+	column 'Age Band'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: age_band
+		sortByColumn: 'Age Band Sort'
+
+	/// Level1-12, ordinal (anonymised).
+	column 'Income Band'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: income_band
+		sortByColumn: 'Income Band Sort'
+
+	column 'Household Size'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: household_size
+		sortByColumn: 'Household Size Sort'
+
+	/// Group1-6, ordinal (anonymised).
+	column 'Household Composition'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: household_composition
+		sortByColumn: 'Household Composition Sort'
+
+	column 'Homeowner Status'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: homeowner_status
+
+	column Children
+		dataType: string
+		summarizeBy: none
+		sourceColumn: children_band
+		sortByColumn: 'Children Sort'
+
+	column 'Age Band Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: age_band_sort
+
+	column 'Income Band Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: income_band_sort
+
+	column 'Household Size Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: household_size_sort
+
+	column 'Household Composition Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: household_composition_sort
+
+	column 'Children Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: children_band_sort
+
+	partition Household = entity
+		mode: directLake
+		source
+			entityName: dim_household
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

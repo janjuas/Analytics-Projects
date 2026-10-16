@@ -1,0 +1,34 @@
+/// One row per store (582). Only 115 have display and mailer tracking.
+table Store
+
+	column 'Store Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: store_sk
+
+	column 'Store ID'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column 'Has Promo Tracking'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: has_promo_tracking
+
+	/// Tercile of panel spend (High / Medium / Low), not store size.
+	column 'Panel Sales Band'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: panel_sales_band
+
+	partition Store = entity
+		mode: directLake
+		source
+			entityName: dim_store
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

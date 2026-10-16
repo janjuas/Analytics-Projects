@@ -1,0 +1,104 @@
+/// Pre-aggregated: shopping behaviour by income band x household composition, plus an Unknown row.
+table 'Household Segment'
+
+	/// Households in the segment(s).
+	measure 'Segment Households' = SUM('Household Segment'[Households])
+		formatString: #,##0
+		displayFolder: Segments
+
+	/// Average two-year spend per household.
+	measure 'Sales per Household' = DIVIDE(SUMX('Household Segment', 'Household Segment'[Sales per Household Value] * 'Household Segment'[Households]), [Segment Households])
+		formatString: $#,##0
+		displayFolder: Segments
+
+	/// Average basket value, averaged per household.
+	measure 'Segment Basket Value' = DIVIDE(SUMX('Household Segment', 'Household Segment'[Avg Basket Value] * 'Household Segment'[Households]), [Segment Households])
+		formatString: $#,##0.00
+		displayFolder: Segments
+
+	/// Share of baskets using a manufacturer coupon.
+	measure 'Segment Coupon Basket %' = DIVIDE(SUMX('Household Segment', 'Household Segment'[Coupon Basket Share] * 'Household Segment'[Segment Baskets]), SUM('Household Segment'[Segment Baskets]))
+		formatString: 0.0%
+		displayFolder: Segments
+
+	/// Loyalty discount as a share of shelf value (promotion sensitivity), basket-weighted.
+	measure 'Segment Loyalty Discount %' = DIVIDE(SUMX('Household Segment', 'Household Segment'[Loyalty Discount Share] * 'Household Segment'[Segment Baskets]), SUM('Household Segment'[Segment Baskets]))
+		formatString: 0.0%
+		displayFolder: Segments
+
+	column 'Income Band'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: income_band
+		sortByColumn: 'Income Band Sort'
+
+	column 'Income Band Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: income_band_sort
+
+	column 'Household Composition'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: household_composition
+		sortByColumn: 'Household Composition Sort'
+
+	column 'Household Composition Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: household_composition_sort
+
+	column Households
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: households
+
+	column 'Segment Baskets'
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: baskets
+
+	column 'Sales per Household Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: sales_per_household
+
+	column 'Avg Basket Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: avg_basket_value
+
+	column 'Loyalty Discount Share'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: loyalty_discount_share
+
+	column 'Coupon Basket Share'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: coupon_basket_share
+
+	/// 1 when the segment has fewer than 10 households.
+	column 'Is Small Segment'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: is_small_segment
+
+	partition 'Household Segment' = entity
+		mode: directLake
+		source
+			entityName: household_segment_summary
+			schemaName: analysis
+			expressionSource: 'DirectLake - Retail Promotions'
+

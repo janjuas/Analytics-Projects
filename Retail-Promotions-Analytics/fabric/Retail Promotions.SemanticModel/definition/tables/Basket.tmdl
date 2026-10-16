@@ -1,0 +1,74 @@
+/// One row per shopping trip (276k baskets).
+table Basket
+
+	/// Number of shopping trips.
+	measure Baskets = COUNTROWS(Basket)
+		formatString: #,##0
+		displayFolder: Baskets
+
+	/// Average sales value per shopping trip.
+	measure 'Average Basket Value' = DIVIDE(SUM(Basket[Basket Sales Value]), [Baskets])
+		formatString: $#,##0.00
+		displayFolder: Baskets
+
+	/// Average units per shopping trip.
+	measure 'Items per Basket' = DIVIDE(SUM(Basket[Item Quantity]), [Baskets])
+		formatString: #,##0.0
+		displayFolder: Baskets
+
+	/// Share of shopping trips using at least one manufacturer coupon.
+	measure 'Coupon Basket %' = DIVIDE(CALCULATE([Baskets], Basket[Has Coupon] = 1), [Baskets])
+		formatString: 0.0%
+		displayFolder: Baskets
+
+	column 'Household Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: household_sk
+
+	column 'Store Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: store_sk
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column 'Item Quantity'
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: item_quantity
+
+	column 'Distinct Products'
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: distinct_products
+
+	column 'Basket Sales Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: sales_value
+
+	/// 1 when any line in the basket used a manufacturer coupon.
+	column 'Has Coupon'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: has_coupon
+
+	partition Basket = entity
+		mode: directLake
+		source
+			entityName: fct_basket
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

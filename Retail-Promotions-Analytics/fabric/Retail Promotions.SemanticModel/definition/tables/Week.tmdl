@@ -1,0 +1,41 @@
+/// One row per source week. Promotion data covers weeks 9-101.
+table Week
+
+	column 'Week Number'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: week_number
+
+	column 'Week Start'
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		summarizeBy: none
+		sourceColumn: week_start_date
+
+	column 'Week End'
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		summarizeBy: none
+		sourceColumn: week_end_date
+
+	column 'Study Year'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: study_year
+
+	/// 1 for weeks covered by display and mailer data.
+	column 'Is Promo Tracked Week'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: is_promo_tracked_week
+
+	partition Week = entity
+		mode: directLake
+		source
+			entityName: dim_week
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

@@ -1,0 +1,44 @@
+/// One row per product (92k).
+table Product
+
+	column 'Product Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: product_sk
+
+	column Department
+		dataType: string
+		summarizeBy: none
+		sourceColumn: department
+
+	column Commodity
+		dataType: string
+		summarizeBy: none
+		sourceColumn: commodity
+
+	column 'Sub Commodity'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: sub_commodity
+
+	/// National brand or retailer private label.
+	column 'Brand Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: brand_type
+
+	/// 0 for fuel, miscellaneous transactions, coupons and unknown items.
+	column 'Is Merchandise'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: is_merchandise
+
+	partition Product = entity
+		mode: directLake
+		source
+			entityName: dim_product
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

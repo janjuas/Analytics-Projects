@@ -1,0 +1,80 @@
+/// Pre-aggregated difference-in-differences per campaign, with controls matched on pre-campaign spend.
+table 'Campaign Effect'
+
+	/// Spend-matched lift relative to targeted households' pre-campaign spend, weighted by active targeted households.
+	measure 'Campaign Lift %' = DIVIDE(SUMX('Campaign Effect', 'Campaign Effect'[Lift per Household Value] * 'Campaign Effect'[Active Targeted Households]), SUMX('Campaign Effect', 'Campaign Effect'[Avg Sales Before Targeted] * 'Campaign Effect'[Active Targeted Households]))
+		formatString: +0.0%;-0.0%
+		displayFolder: Campaign Effect
+
+	/// Spend-matched difference-in-differences in sales per household.
+	measure 'Lift per Household' = DIVIDE(SUMX('Campaign Effect', 'Campaign Effect'[Lift per Household Value] * 'Campaign Effect'[Active Targeted Households]), SUM('Campaign Effect'[Active Targeted Households]))
+		formatString: $#,##0.00
+		displayFolder: Campaign Effect
+
+	/// The same comparison against all non-targeted households, without spend matching.
+	measure 'Unmatched Lift per Household' = DIVIDE(SUMX('Campaign Effect', 'Campaign Effect'[Unmatched Lift per Household Value] * 'Campaign Effect'[Active Targeted Households]), SUM('Campaign Effect'[Active Targeted Households]))
+		formatString: $#,##0.00
+		displayFolder: Campaign Effect
+
+	/// Share of targeted households redeeming at least one coupon.
+	measure 'Campaign Redemption Rate %' = DIVIDE(SUMX('Campaign Effect', 'Campaign Effect'[Redemption Rate Value] * 'Campaign Effect'[Households Targeted]), SUM('Campaign Effect'[Households Targeted]))
+		formatString: 0.0%
+		displayFolder: Campaign Effect
+
+	column 'Campaign ID'
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: campaign_id
+
+	column 'Households Targeted'
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: households_targeted
+
+	column 'Active Targeted Households'
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: households_targeted_active
+
+	column 'Avg Sales Before Targeted'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: avg_sales_before_targeted
+
+	column 'Lift per Household Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: did_per_household
+
+	column 'Unmatched Lift per Household Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: did_per_household_unmatched
+
+	column 'Redemption Rate Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: redemption_rate
+
+	/// 1 when fewer than 30 targeted households were active.
+	column 'Is Small Campaign'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: is_small_campaign
+
+	partition 'Campaign Effect' = entity
+		mode: directLake
+		source
+			entityName: campaign_effect
+			schemaName: analysis
+			expressionSource: 'DirectLake - Retail Promotions'
+

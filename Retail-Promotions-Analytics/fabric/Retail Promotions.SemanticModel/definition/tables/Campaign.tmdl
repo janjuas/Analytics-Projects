@@ -1,0 +1,62 @@
+/// One row per marketing campaign (30).
+table Campaign
+
+	column 'Campaign Key'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: campaign_sk
+
+	column 'Campaign ID'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: campaign_id
+
+	column 'Campaign Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: campaign_type
+
+	column 'Campaign Type Description'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: campaign_type_description
+
+	column 'Start Date'
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		summarizeBy: none
+		sourceColumn: start_date
+
+	column 'End Date'
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		summarizeBy: none
+		sourceColumn: end_date
+
+	column 'Duration Days'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: duration_days
+
+	column 'Households Targeted'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: households_targeted
+
+	column 'Coupons in Pool'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: coupons_in_pool
+
+	partition Campaign = entity
+		mode: directLake
+		source
+			entityName: dim_campaign
+			schemaName: marts
+			expressionSource: 'DirectLake - Retail Promotions'
+

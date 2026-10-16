@@ -1,0 +1,54 @@
+/// Pre-aggregated: private-label share of sales by department, study year 1 vs. 2 (merchandise only).
+table 'Private Label Share'
+
+	/// Private-label share of sales in study year 1.
+	measure 'Private Share Year 1 %' = DIVIDE(SUMX('Private Label Share', 'Private Label Share'[Private Share Year 1 Value] * 'Private Label Share'[Sales Value Year 1]), SUM('Private Label Share'[Sales Value Year 1]))
+		formatString: 0.0%
+		displayFolder: Private Label
+
+	/// Private-label share of sales in study year 2.
+	measure 'Private Share Year 2 %' = DIVIDE(SUMX('Private Label Share', 'Private Label Share'[Private Share Year 2 Value] * 'Private Label Share'[Sales Value Year 2]), SUM('Private Label Share'[Sales Value Year 2]))
+		formatString: 0.0%
+		displayFolder: Private Label
+
+	/// Change in private-label share from year 1 to year 2, in percentage points.
+	measure 'Private Share Change (pp)' = ([Private Share Year 2 %] - [Private Share Year 1 %]) * 100
+		formatString: +0.0;-0.0
+		displayFolder: Private Label
+
+	column Department
+		dataType: string
+		summarizeBy: none
+		sourceColumn: department
+
+	column 'Sales Value Year 1'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: sales_value_y1
+
+	column 'Sales Value Year 2'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: sales_value_y2
+
+	column 'Private Share Year 1 Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: private_share_y1
+
+	column 'Private Share Year 2 Value'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: private_share_y2
+
+	partition 'Private Label Share' = entity
+		mode: directLake
+		source
+			entityName: private_label_share
+			schemaName: analysis
+			expressionSource: 'DirectLake - Retail Promotions'
+

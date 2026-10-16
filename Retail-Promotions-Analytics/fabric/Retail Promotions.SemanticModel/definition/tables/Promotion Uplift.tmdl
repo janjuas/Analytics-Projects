@@ -1,0 +1,64 @@
+/// Pre-aggregated: units in promoted vs. non-promoted weeks for the same product and store, by department and promotion type. Weeks with sales only.
+table 'Promotion Uplift'
+
+	/// Unit uplift in promoted weeks vs. baseline, weighted by product-store pairs.
+	measure 'Promotion Uplift %' = DIVIDE(SUMX('Promotion Uplift', 'Promotion Uplift'[Uplift Pct] * 'Promotion Uplift'[Product Store Pairs]), SUM('Promotion Uplift'[Product Store Pairs]))
+		formatString: +0.0%;-0.0%
+		displayFolder: Promotion Uplift
+
+	/// Product-store pairs with both promoted and baseline weeks.
+	measure 'Uplift Product Store Pairs' = SUM('Promotion Uplift'[Product Store Pairs])
+		formatString: #,##0
+		displayFolder: Promotion Uplift
+
+	/// Average units in promoted weeks with sales.
+	measure 'Units per Promoted Week' = DIVIDE(SUMX('Promotion Uplift', 'Promotion Uplift'[Avg Units Promoted] * 'Promotion Uplift'[Product Store Pairs]), [Uplift Product Store Pairs])
+		formatString: #,##0.00
+		displayFolder: Promotion Uplift
+
+	/// Average units in non-promoted weeks with sales.
+	measure 'Units per Baseline Week' = DIVIDE(SUMX('Promotion Uplift', 'Promotion Uplift'[Avg Units Baseline] * 'Promotion Uplift'[Product Store Pairs]), [Uplift Product Store Pairs])
+		formatString: #,##0.00
+		displayFolder: Promotion Uplift
+
+	column Department
+		dataType: string
+		summarizeBy: none
+		sourceColumn: department
+
+	column 'Promotion Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: promo_type
+
+	column 'Product Store Pairs'
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceColumn: product_store_pairs
+
+	column 'Avg Units Promoted'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: avg_units_promoted
+
+	column 'Avg Units Baseline'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: avg_units_baseline
+
+	column 'Uplift Pct'
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		sourceColumn: uplift_pct
+
+	partition 'Promotion Uplift' = entity
+		mode: directLake
+		source
+			entityName: promo_uplift_by_department
+			schemaName: analysis
+			expressionSource: 'DirectLake - Retail Promotions'
+
