@@ -1,0 +1,105 @@
+/// Pre-aggregated: units per line by loyalty-discount depth band, by department and commodity (merchandise only, >= 1,000 lines).
+table 'Discount Depth'
+	lineageTag: 11a18d9a-28af-4a81-89da-9e0e9b7a6fa8
+
+	/// Average units bought per line in the band.
+	measure 'Units per Line' = DIVIDE(SUM('Discount Depth'[Units]), SUM('Discount Depth'[Lines]))
+		formatString: #,##0.00
+		displayFolder: Discount Depth
+		lineageTag: 4c49cddf-6718-4157-9503-fd33e4990794
+
+	/// Share of units sold in each depth band.
+	measure 'Band Units %' = DIVIDE(SUM('Discount Depth'[Units]), CALCULATE(SUM('Discount Depth'[Units]), REMOVEFILTERS('Discount Depth'[Discount Depth Band], 'Discount Depth'[Discount Depth Band Sort])))
+		formatString: 0.0%
+		displayFolder: Discount Depth
+		lineageTag: 720b396d-2c1e-475f-b3c5-a979996c70c4
+
+	column Department
+		dataType: string
+		lineageTag: 5026f5a8-7421-4734-8a7e-97a4fbf8a2bd
+		summarizeBy: none
+		sourceColumn: department
+
+	column Commodity
+		dataType: string
+		lineageTag: 3eb2c64f-cb9e-4cb3-8f04-878ca9422338
+		summarizeBy: none
+		sourceColumn: commodity
+
+	column 'Discount Depth Band'
+		dataType: string
+		lineageTag: bc1deaab-e7bd-4d06-99e4-af703ba88d7c
+		summarizeBy: none
+		sourceColumn: discount_depth_band
+		sortByColumn: 'Discount Depth Band Sort'
+
+	column 'Discount Depth Band Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9da16fa5-c835-40e8-84cc-f60e582e5846
+		summarizeBy: none
+		sourceColumn: discount_depth_band_sort
+
+	column Lines
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4369051d-b993-4ba2-abeb-1247fd991d4e
+		sourceColumn: lines
+
+	column Units
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2f6c5df5-466c-44f8-84ab-36ded8a4a5c4
+		sourceColumn: units
+
+	column avg_units_per_line
+		dataType: double
+		lineageTag: 0bb01253-908e-4e46-9521-022cb29869b4
+		summarizeBy: sum
+		sourceColumn: avg_units_per_line
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_shelf_unit_price
+		dataType: double
+		lineageTag: e2ae292a-73ef-4d53-a6df-93f270624eef
+		summarizeBy: sum
+		sourceColumn: avg_shelf_unit_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_paid_unit_price
+		dataType: double
+		lineageTag: 6177073e-a74e-4671-b6e7-c96867d7dbc0
+		summarizeBy: sum
+		sourceColumn: avg_paid_unit_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column units_share_of_commodity
+		dataType: double
+		lineageTag: 9b0e78ba-e95d-48a7-8bc1-3092d7429620
+		summarizeBy: sum
+		sourceColumn: units_share_of_commodity
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Discount Depth' = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="analysis", Item="discount_depth_response"]}[Data]
+				in
+					Data
+

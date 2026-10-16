@@ -1,0 +1,56 @@
+/// Pre-aggregated product-store-weeks by display/mailer code (merchandise only), computed in the warehouse.
+table 'Promotion Week'
+	lineageTag: edbd8ef2-8a33-4e28-949e-3bcb73ebe4f4
+
+	/// Tracked product-store-weeks (merchandise only).
+	measure 'Product Store Weeks' = SUM('Promotion Week'[Weeks])
+		formatString: #,##0
+		displayFolder: Promotions
+		lineageTag: 1561b870-c03f-4be2-aa63-ba99c7fde8ed
+
+	/// Product-store-weeks with a display or mailer feature.
+	measure 'Promoted Weeks' = CALCULATE([Product Store Weeks], 'Promotion Week'[Is Promoted] = 1)
+		formatString: #,##0
+		displayFolder: Promotions
+		lineageTag: cb3de721-4071-4762-81cc-15f8ed36059f
+
+	column 'Display Code'
+		dataType: string
+		isHidden
+		lineageTag: 74f703bc-f30f-4449-bf89-b45498b84f32
+		summarizeBy: none
+		sourceColumn: display_code
+
+	column 'Mailer Code'
+		dataType: string
+		isHidden
+		lineageTag: 7e71e27d-b261-4ba0-aa6e-8c9c76259869
+		summarizeBy: none
+		sourceColumn: mailer_code
+
+	/// 1 when the product was on display or in the mailer that week.
+	column 'Is Promoted'
+		dataType: int64
+		formatString: 0
+		lineageTag: df5e2a54-d634-4191-98cf-c3d3cd41b39e
+		summarizeBy: none
+		sourceColumn: is_promoted
+
+	column Weeks
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d883d554-f6e5-4ee6-87cc-7a47ecda5a1a
+		sourceColumn: weeks
+
+	partition 'Promotion Week' = m
+		mode: import
+		source =
+				let
+					Fact = wh_gold{[Schema="marts", Item="fct_promo_exposure_weekly"]}[Data],
+					Merch = Table.SelectRows(wh_gold{[Schema="marts", Item="dim_product"]}[Data], each [is_merchandise] = 1),
+					Joined = Table.NestedJoin(Fact, {"product_sk"}, Merch, {"product_sk"}, "p", JoinKind.Inner),
+					Grouped = Table.Group(Joined, {"display_code", "mailer_code", "is_promoted"}, {{"weeks", each Table.RowCount(_), Int64.Type}})
+				in
+					Grouped
+

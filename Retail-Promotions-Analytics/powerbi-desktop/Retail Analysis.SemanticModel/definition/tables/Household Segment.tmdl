@@ -1,0 +1,146 @@
+/// Pre-aggregated: shopping behaviour by income band x household composition, plus an Unknown row.
+table 'Household Segment'
+	lineageTag: ff2c692e-905a-46dd-8eb6-982abbb9bab5
+
+	/// Households in the segment(s).
+	measure 'Segment Households' = SUM('Household Segment'[Households])
+		formatString: #,##0
+		displayFolder: Segments
+		lineageTag: 0d9eb315-d59c-46af-9fda-2d405e6775bd
+
+	/// Average two-year spend per household.
+	measure 'Sales per Household' = DIVIDE(SUMX('Household Segment', 'Household Segment'[Sales per Household Value] * 'Household Segment'[Households]), [Segment Households])
+		formatString: $#,##0
+		displayFolder: Segments
+		lineageTag: e4fde9d4-13cf-45e2-8c52-b8239e20cc29
+
+	/// Average basket value, averaged per household.
+	measure 'Segment Basket Value' = DIVIDE(SUMX('Household Segment', 'Household Segment'[Avg Basket Value] * 'Household Segment'[Households]), [Segment Households])
+		formatString: $#,##0.00
+		displayFolder: Segments
+		lineageTag: 6e7f834f-b5f9-49ba-9aae-d9a02ab4a849
+
+	/// Share of baskets using a manufacturer coupon.
+	measure 'Segment Coupon Basket %' = DIVIDE(SUMX('Household Segment', 'Household Segment'[Coupon Basket Share] * 'Household Segment'[Segment Baskets]), SUM('Household Segment'[Segment Baskets]))
+		formatString: 0.0%
+		displayFolder: Segments
+		lineageTag: c9fb346f-4e7e-4b06-bd46-526006fd9770
+
+	/// Loyalty discount as a share of shelf value (promotion sensitivity), basket-weighted.
+	measure 'Segment Loyalty Discount %' = DIVIDE(SUMX('Household Segment', 'Household Segment'[Loyalty Discount Share] * 'Household Segment'[Segment Baskets]), SUM('Household Segment'[Segment Baskets]))
+		formatString: 0.0%
+		displayFolder: Segments
+		lineageTag: 748fcd12-6561-44c5-a364-c2c4ab613d10
+
+	column 'Income Band'
+		dataType: string
+		lineageTag: 4d77dcb0-edaa-45c8-a323-f2ebf24f3c43
+		summarizeBy: none
+		sourceColumn: income_band
+		sortByColumn: 'Income Band Sort'
+
+	column 'Income Band Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b3e1c05d-bcea-4318-af12-4f7b31255fa9
+		summarizeBy: none
+		sourceColumn: income_band_sort
+
+	column 'Household Composition'
+		dataType: string
+		lineageTag: 6bea74f0-7221-4fd5-a8a7-9acddcb7543d
+		summarizeBy: none
+		sourceColumn: household_composition
+		sortByColumn: 'Household Composition Sort'
+
+	column 'Household Composition Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 40263af7-13ef-4b52-b790-98db6b451ef0
+		summarizeBy: none
+		sourceColumn: household_composition_sort
+
+	column Households
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d219d542-6103-4df5-953c-e803c58d7af6
+		sourceColumn: households
+
+	column 'Segment Baskets'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 209fcf3b-10d2-480f-94de-d2f0b1ac668d
+		sourceColumn: baskets
+
+	column 'Sales per Household Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: f5f9eb04-1a94-4591-888f-93f1237934be
+		summarizeBy: sum
+		sourceColumn: sales_per_household
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Avg Basket Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 5f2a131d-6195-4570-a2e2-ace71c214ebc
+		summarizeBy: sum
+		sourceColumn: avg_basket_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Loyalty Discount Share'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: f17e9c44-a743-4e71-9dda-95a4033284f1
+		summarizeBy: sum
+		sourceColumn: loyalty_discount_share
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Coupon Basket Share'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 73df1f3e-07e9-4994-9c08-ce7c6215c364
+		summarizeBy: sum
+		sourceColumn: coupon_basket_share
+
+		annotation SummarizationSetBy = Automatic
+
+	/// 1 when the segment has fewer than 10 households.
+	column 'Is Small Segment'
+		dataType: int64
+		formatString: 0
+		lineageTag: 02a4541a-ad29-4335-b3ee-71082d990fc4
+		summarizeBy: none
+		sourceColumn: is_small_segment
+
+	column baskets_per_household
+		dataType: double
+		lineageTag: 77bdd43a-df3b-4fba-84a3-e3eeaecb02b7
+		summarizeBy: sum
+		sourceColumn: baskets_per_household
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Household Segment' = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="analysis", Item="household_segment_summary"]}[Data]
+				in
+					Data
+
+	annotation PBI_ResultType = Table
+

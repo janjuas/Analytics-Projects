@@ -1,0 +1,41 @@
+relationship 'Sales to Date Date Key'
+	fromColumn: Sales.'Date Key'
+	toColumn: Date.'Date Key'
+
+relationship 'Sales to Household Household Key'
+	fromColumn: Sales.'Household Key'
+	toColumn: Household.'Household Key'
+
+relationship 'Sales to Product Product Key'
+	fromColumn: Sales.'Product Key'
+	toColumn: Product.'Product Key'
+
+relationship 'Sales to Store Store Key'
+	fromColumn: Sales.'Store Key'
+	toColumn: Store.'Store Key'
+
+relationship 'Basket to Date Date Key'
+	fromColumn: Basket.'Date Key'
+	toColumn: Date.'Date Key'
+
+relationship 'Basket to Household Household Key'
+	fromColumn: Basket.'Household Key'
+	toColumn: Household.'Household Key'
+
+relationship 'Basket to Store Store Key'
+	fromColumn: Basket.'Store Key'
+	toColumn: Store.'Store Key'
+
+relationship 'Campaign Effect to Campaign Campaign ID'
+	fromColumn: 'Campaign Effect'.'Campaign ID'
+	toColumn: Campaign.'Campaign ID'
+
+relationship 'Promotion Week to Display Location Display Code'
+	fromColumn: 'Promotion Week'.'Display Code'
+	toColumn: 'Display Location'.'Display Code'
+
+relationship AutoDetected_13ee2913-6a21-498c-a58c-ab6ec723ba59
+	isActive: false
+	fromColumn: Sales.basket_id
+	toColumn: Basket.basket_id
+

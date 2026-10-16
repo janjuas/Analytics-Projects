@@ -1,6 +1,6 @@
 # Target star schema (gold, `wh_gold.marts`)
 
-Status: the full star schema is built and tested (✅): 8 dimensions, 5 facts, 2 seeds. Analysis marts are next.
+Status: complete. The star schema (8 dimensions, 5 facts, 2 seeds) and the 5 analysis marts are built and tested.
 
 ## Dimensions
 
@@ -33,14 +33,13 @@ Built in `dbt/models/marts/analysis/`, merchandise only (`dim_product.is_merchan
 `promo_uplift_by_department`, `discount_depth_response`, `campaign_effect`, `household_segment_summary`,
 `private_label_share`.
 
-
 - **Promotion uplift:** weekly unit sales when a product is on display or in the mailer vs. when it isn't, by department.
 - **Price elasticity / discount depth:** sales response to `retail_discount` depth by commodity.
 - **Campaign ROI:** response rate and incremental spend of targeted vs. non-targeted households, by campaign type.
 - **Demographic segments (CACI angle):** spend, basket size and promo sensitivity by income band × household composition.
 - **Private label share:** private vs. national share by department over time.
 
-## Tests in place
+## Tests
 
 - Model contracts on every dimension and fact.
 - `relationships` from every fact key to its dimension, including seed-backed display and mailer codes.

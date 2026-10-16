@@ -1,0 +1,67 @@
+/// One row per store (582). Only 115 have display and mailer tracking.
+table Store
+	lineageTag: 8f7f4a68-1e57-4b52-b6f4-f0e535f7090d
+
+	column 'Store Key'
+		dataType: string
+		isHidden
+		lineageTag: 19f9e3d2-8aa9-420c-a7b8-55ba5589cc44
+		summarizeBy: none
+		sourceColumn: store_sk
+
+	column 'Store ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: df927400-38db-46bf-8ffd-5651c786ec39
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column 'Has Promo Tracking'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3396610e-5921-4037-84d6-5f3463c46bd1
+		summarizeBy: none
+		sourceColumn: has_promo_tracking
+
+	/// Tercile of panel spend (High / Medium / Low), not store size.
+	column 'Panel Sales Band'
+		dataType: string
+		lineageTag: 4e217f18-d681-4921-adff-187fb52d4437
+		summarizeBy: none
+		sourceColumn: panel_sales_band
+
+	column first_trading_day
+		dataType: int64
+		formatString: 0
+		lineageTag: ac6b6e90-853e-4c1c-ae2b-de64335dd472
+		summarizeBy: sum
+		sourceColumn: first_trading_day
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_trading_day
+		dataType: int64
+		formatString: 0
+		lineageTag: f932e73f-620a-4811-b27c-87330822dfff
+		summarizeBy: sum
+		sourceColumn: last_trading_day
+
+		annotation SummarizationSetBy = Automatic
+
+	column panel_households
+		dataType: int64
+		formatString: 0
+		lineageTag: e13421f8-1584-4703-8798-fe21dc5f03b1
+		summarizeBy: sum
+		sourceColumn: panel_households
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Store = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="marts", Item="dim_store"]}[Data]
+				in
+					Data
+

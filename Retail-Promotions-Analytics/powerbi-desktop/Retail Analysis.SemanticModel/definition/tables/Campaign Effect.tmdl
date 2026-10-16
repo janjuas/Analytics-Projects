@@ -1,0 +1,163 @@
+/// Pre-aggregated difference-in-differences per campaign, with controls matched on pre-campaign spend.
+table 'Campaign Effect'
+	lineageTag: d19e9b82-4b1d-4714-85bb-396c25debd5b
+
+	/// Spend-matched lift relative to targeted households' pre-campaign spend, weighted by active targeted households.
+	measure 'Campaign Lift %' = DIVIDE(SUMX('Campaign Effect', 'Campaign Effect'[Lift per Household Value] * 'Campaign Effect'[Active Targeted Households]), SUMX('Campaign Effect', 'Campaign Effect'[Avg Sales Before Targeted] * 'Campaign Effect'[Active Targeted Households]))
+		formatString: +0.0%;-0.0%
+		displayFolder: Campaign Effect
+		lineageTag: 8c9a5732-1a0d-4987-b900-c5762a3e19bb
+
+	/// Spend-matched difference-in-differences in sales per household.
+	measure 'Lift per Household' = DIVIDE(SUMX('Campaign Effect', 'Campaign Effect'[Lift per Household Value] * 'Campaign Effect'[Active Targeted Households]), SUM('Campaign Effect'[Active Targeted Households]))
+		formatString: $#,##0.00
+		displayFolder: Campaign Effect
+		lineageTag: 2c018acc-e65d-4ab1-b911-7b2ca900f818
+
+	/// The same comparison against all non-targeted households, without spend matching.
+	measure 'Unmatched Lift per Household' = DIVIDE(SUMX('Campaign Effect', 'Campaign Effect'[Unmatched Lift per Household Value] * 'Campaign Effect'[Active Targeted Households]), SUM('Campaign Effect'[Active Targeted Households]))
+		formatString: $#,##0.00
+		displayFolder: Campaign Effect
+		lineageTag: fba87ebb-b39d-4604-86f6-c1ae37a37eb8
+
+	/// Share of targeted households redeeming at least one coupon.
+	measure 'Campaign Redemption Rate %' = DIVIDE(SUMX('Campaign Effect', 'Campaign Effect'[Redemption Rate Value] * 'Campaign Effect'[Households Targeted]), SUM('Campaign Effect'[Households Targeted]))
+		formatString: 0.0%
+		displayFolder: Campaign Effect
+		lineageTag: 1ee1458f-8fa6-4f96-950f-6c30d67bc211
+
+	column 'Campaign ID'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 66ccc780-ade0-4ffc-ba44-f5ce109c7659
+		summarizeBy: none
+		sourceColumn: campaign_id
+
+	column 'Households Targeted'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2d3b2369-3fad-4ad2-9650-0f9d5b5c5155
+		sourceColumn: households_targeted
+
+	column 'Active Targeted Households'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: acf7fbf1-0c6a-4b93-bd71-6c4f22aea74c
+		sourceColumn: households_targeted_active
+
+	column 'Avg Sales Before Targeted'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 311b4967-6fcd-47e2-ad69-abb289ac08cc
+		summarizeBy: sum
+		sourceColumn: avg_sales_before_targeted
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lift per Household Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 675e12d4-a2b1-4cc6-b339-60857524a43e
+		summarizeBy: sum
+		sourceColumn: did_per_household
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unmatched Lift per Household Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 566e2125-2b7e-4e53-8f5d-4669dbced356
+		summarizeBy: sum
+		sourceColumn: did_per_household_unmatched
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Redemption Rate Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: a32d581a-f989-4194-80b8-cbdbd2480ea8
+		summarizeBy: sum
+		sourceColumn: redemption_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	/// 1 when fewer than 30 targeted households were active.
+	column 'Is Small Campaign'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5b63a9a6-6204-4912-a9c1-5aa162642882
+		summarizeBy: none
+		sourceColumn: is_small_campaign
+
+	column campaign_type
+		dataType: string
+		lineageTag: 956709af-0880-441e-af11-07932c09a076
+		summarizeBy: none
+		sourceColumn: campaign_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column households_control
+		dataType: int64
+		formatString: 0
+		lineageTag: 2ea028ad-facd-43b0-bf47-fa1b164852ac
+		summarizeBy: sum
+		sourceColumn: households_control
+
+		annotation SummarizationSetBy = Automatic
+
+	column avg_sales_during_targeted
+		dataType: double
+		lineageTag: 7396a323-fad2-43a2-be5c-a7063f295710
+		summarizeBy: sum
+		sourceColumn: avg_sales_during_targeted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_sales_before_control
+		dataType: double
+		lineageTag: b52d621f-2444-41c7-98b4-9a37e1f1ab89
+		summarizeBy: sum
+		sourceColumn: avg_sales_before_control
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_sales_during_control
+		dataType: double
+		lineageTag: ef00d564-7a23-4dbb-b620-c9f2dae13932
+		summarizeBy: sum
+		sourceColumn: avg_sales_during_control
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column did_pct
+		dataType: double
+		lineageTag: a3037d47-5435-4e57-b7f1-6fc7eca9e7f5
+		summarizeBy: sum
+		sourceColumn: did_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Campaign Effect' = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="analysis", Item="campaign_effect"]}[Data]
+				in
+					Data
+

@@ -1,0 +1,103 @@
+/// Pre-aggregated: units in promoted vs. non-promoted weeks for the same product and store, by department and promotion type. Weeks with sales only.
+table 'Promotion Uplift'
+	lineageTag: 9789c442-3e09-4126-9ed2-9a64348d0715
+
+	/// Unit uplift in promoted weeks vs. baseline, weighted by product-store pairs.
+	measure 'Promotion Uplift %' = DIVIDE(SUMX('Promotion Uplift', 'Promotion Uplift'[Uplift Pct] * 'Promotion Uplift'[Product Store Pairs]), SUM('Promotion Uplift'[Product Store Pairs]))
+		formatString: +0.0%;-0.0%
+		displayFolder: Promotion Uplift
+		lineageTag: 42f9f0a6-44b2-4993-aac4-907ec44f5c57
+
+	/// Product-store pairs with both promoted and baseline weeks.
+	measure 'Uplift Product Store Pairs' = SUM('Promotion Uplift'[Product Store Pairs])
+		formatString: #,##0
+		displayFolder: Promotion Uplift
+		lineageTag: 63086bc3-9e8a-4014-89e9-0e142ceff79e
+
+	/// Average units in promoted weeks with sales.
+	measure 'Units per Promoted Week' = DIVIDE(SUMX('Promotion Uplift', 'Promotion Uplift'[Avg Units Promoted] * 'Promotion Uplift'[Product Store Pairs]), [Uplift Product Store Pairs])
+		formatString: #,##0.00
+		displayFolder: Promotion Uplift
+		lineageTag: a0948633-027a-4da2-b559-428df3c95487
+
+	/// Average units in non-promoted weeks with sales.
+	measure 'Units per Baseline Week' = DIVIDE(SUMX('Promotion Uplift', 'Promotion Uplift'[Avg Units Baseline] * 'Promotion Uplift'[Product Store Pairs]), [Uplift Product Store Pairs])
+		formatString: #,##0.00
+		displayFolder: Promotion Uplift
+		lineageTag: a9ce31ce-0ab9-4eaa-ab99-937dad19f13b
+
+	column Department
+		dataType: string
+		lineageTag: ca7e6b49-2222-4588-b9be-48402ca9f370
+		summarizeBy: none
+		sourceColumn: department
+
+	column 'Promotion Type'
+		dataType: string
+		lineageTag: 75391416-dd81-4e1f-8707-d90a1b41064e
+		summarizeBy: none
+		sourceColumn: promo_type
+
+	column 'Product Store Pairs'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4e14571b-5bd0-43fc-aef4-3fd49d44e11f
+		sourceColumn: product_store_pairs
+
+	column 'Avg Units Promoted'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: b4aa0e0b-c90d-4054-88eb-dddb6149e985
+		summarizeBy: sum
+		sourceColumn: avg_units_promoted
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Avg Units Baseline'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: ce94636a-0e02-48df-9e4d-b5f7bf06eecc
+		summarizeBy: sum
+		sourceColumn: avg_units_baseline
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Uplift Pct'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: cd7017f7-264e-4db2-a933-200234748e6a
+		summarizeBy: sum
+		sourceColumn: uplift_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column promoted_weeks
+		dataType: int64
+		formatString: 0
+		lineageTag: 3437021d-89bc-4f5c-aa6c-50a67e754091
+		summarizeBy: sum
+		sourceColumn: promoted_weeks
+
+		annotation SummarizationSetBy = Automatic
+
+	column baseline_weeks
+		dataType: int64
+		formatString: 0
+		lineageTag: a6d5b92e-bcaa-4da6-a25c-e6b1235d1bdc
+		summarizeBy: sum
+		sourceColumn: baseline_weeks
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Promotion Uplift' = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="analysis", Item="promo_uplift_by_department"]}[Data]
+				in
+					Data
+
