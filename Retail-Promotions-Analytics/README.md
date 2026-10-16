@@ -1,190 +1,106 @@
-# Retail promotions analytics — dunnhumby "The Complete Journey" on Microsoft Fabric + dbt
+# Retail Promotions Analytics
 
-Two years of grocery transactions for 2,500 households, along with product, demographic, campaign, coupon and weekly
-in-store promotion data. The raw files land in a Fabric Lakehouse (bronze), Spark cleans them (silver), and dbt models
-a tested, documented star schema in a Fabric Warehouse (gold). Every change goes through GitHub pull requests, and a
-Fabric deployment pipeline promotes items from dev to prod.
+**Which promotions, discounts and campaigns paid off?** Two years of grocery shopping by 2,500 households
+(dunnhumby, *The Complete Journey*), modelled in Microsoft Fabric and dbt and reported in Power BI.
+
+**[Open the interactive report](https://app.powerbi.com/view?r=eyJrIjoiN2QzOWE3NmUtZGMwMS00YTY1LTlmMjAtZGIwNDJkM2EyYWQ3IiwidCI6IjUyNzFkN2Y2LWUxMGItNGY2Yi1hMjEzLTRiY2MzZjM1ZGQyYyJ9&pageName=2d998bfd249881af)**
+(Power BI, five pages, no sign-in needed)
+
+![Retail Promotions report, Overview page](images/report-overview.png)
+
+## Headline figures
+
+| Sales value | Shopping trips | Average basket | Loyalty discount | Promotion uplift | Campaign lift |
+|---:|---:|---:|---:|---:|---:|
+| £8.06M | 276,484 | £29.14 | 14.8% of shelf value | +13.7% | +9.4% |
+
+Study days 1–711 (weeks 1–102), 2,595,732 sales lines. Sales value is what the retailer received after discounts.
+
+## Findings
+
+**1. Display plus mailer is the mechanic that earns its place.** For each product in each store, weekly unit sales
+in promoted weeks were compared with weeks without a promotion (115 tracked stores, merchandise only, 166,725
+product-store pairs).
+
+| Mechanic | Uplift in weekly units |
+|---|---:|
+| Display + mailer | +22.0% |
+| Mailer only | +13.4% |
+| Display only | +6.8% |
+
+A mailer feature does most of the work. A display without a mailer adds little, and in packaged seafood it showed no
+uplift at all (−2.1%).
+
+**2. Shallow discounts do not move volume.** Shoppers buy 1.26 units per line at full price and 1.27–1.31 units at
+1–30% off. Only discounts above 30% show a clear jump, to 1.46. Almost half of all units (47.6%) sell at full price.
+
+**3. Own-label share is flat.** Private label was 21.2% of merchandise sales in year 1 and 21.5% in year 2. Packaged
+meat gained most (+2.8 points); seafood and floral lost share.
+
+**4. Campaigns lifted spend, once compared fairly.** Targeted households already spent about twice as much as
+everyone else, so each campaign is measured against households with similar spend before it started.
+
+| Campaign type | Campaigns | Lift | Extra spend per household | Coupon redemption |
+|---|---:|---:|---:|---:|
+| Type A | 5 | +10.5% | £42.76 | 16.0% |
+| Type B | 19 | +8.3% | £34.46 | 8.0% |
+| Type C | 6 | +7.8% | £61.30 | 7.7% |
+| **All** | **30** | **+9.4%** | **£41.28** | **12.4%** |
+
+A simple comparison against all non-targeted households shows only £2.51 per household and would have undervalued
+the campaigns.
+
+**5. Higher income bands spend more and use more coupons.** Income Levels 7–9 spend £7,000–8,250 per household over
+the two years, against £4,100–5,500 for Levels 1–4. Coupons are used on 9–11% of trips at Levels 5, 6, 8 and 9, and on
+about 6% at Levels 1–4; Level 7 is the exception at 5.3%. The top bands hold 12–29 households each, so treat band-level differences as directional.
+
+## Recommendations
+
+1. **Pair displays with a mailer feature.** Review standalone display slots, starting with departments where display
+   alone shows little or no uplift, such as packaged seafood and produce.
+2. **Test fewer, deeper discounts.** Discounts of 1–30% do not change basket quantity. A controlled test moving some of
+   that spend to 30%+ offers on fewer lines would show whether margin and units both improve.
+3. **Keep Type A campaigns and check Type C economics.** Type A has the best redemption and percentage lift. Type C
+   gives the largest lift per household, so its cost per household decides whether it pays.
+4. **Measure every campaign against matched households.** The unmatched comparison understated the effect by about
+   £39 per household. The matched method is built into the data model and can be reused.
+5. **Fill the demographic gap.** Two-thirds of households have no demographics, which limits segment targeting.
+
+## The report
+
+| Page | Question it answers |
+|---|---|
+| Overview | How did the business perform over the two years? |
+| Promotions | Which promotion mechanic earns its place, and in which departments? |
+| Discounts and Private Label | Are discounts deep enough, and is own-label growing? |
+| Campaigns | Did campaigns lift spend against comparable households? |
+| Customers | Which segments are most valuable and most promotion-sensitive? |
+
+Each page states its main caveat under the title.
+
+## How it was built
 
 ```
- CSV files ──► lh_bronze ──────────────► lh_silver ───────────────► wh_gold (dbt)
- (OneLake)     Files/raw + raw_* Delta    typed, cleaned, deduped    staging (views) ─► marts (tables)
-               nb_01_bronze_ingest        nb_02_silver_clean         tests · docs · contracts
-                                          _rejects (with reason)
-
- GitHub (PRs, dbt CI) ◄──► dunnhumby-promo-dev ──[deployment pipeline]──► dunnhumby-promo-prod
+ CSV files ──► lh_bronze ──────► lh_silver ──────► wh_gold (dbt) ──────► Power BI
+               raw, as landed    typed, cleaned    star schema +         Fabric report and
+               (Spark)           (Spark)           analysis tables       Desktop version
 ```
 
-## What exists
+- **Microsoft Fabric** lakehouses and warehouse, with Spark notebooks for loading and cleaning.
+- **dbt** builds a star schema of 8 dimensions and 5 facts, plus 5 analysis tables, all tested: contracts,
+  relationship tests, reconciliation tests and a unit test on the pricing logic. It runs as a Fabric dbt job.
+- **GitHub** pull requests for every change, with CI on each pull request and a dev-to-prod deployment pipeline.
+- **Power BI** report on a Direct Lake semantic model in Fabric, plus an import-mode copy for Power BI Desktop.
 
-| Resource | Name | ID |
-|---|---|---|
-| Capacity | Trial (FTL64, UK South) | `6315ea76-3056-4f91-8209-24c0a6ad0e00` |
-| Workspace (dev) | `dunnhumby-promo-dev` | `b012dc67-8617-4001-9e2c-87ca2d1c24ca` |
-| Workspace (prod) | `dunnhumby-promo-prod` | `9da73741-81f4-4edc-a1c0-33045a507804` |
-| Lakehouse | `lh_bronze` | `960dce80-36fe-42f9-9e94-c092c07e0f4a` |
-| Lakehouse | `lh_silver` | `aba1354d-6905-47e8-852a-366ad2745478` |
-| Warehouse | `wh_gold` | `f2e91e90-11a1-4eed-8d5d-b2c59e034c22` |
-| Notebook | `nb_01_bronze_ingest` | `34d77549-2c09-4864-bdee-d1cd16898462` |
-| Notebook | `nb_02_silver_clean` | `891a9c48-45c0-412f-a049-4f812b5e1a17` |
-| dbt job | `dbt_promo_star_schema` (project: `lh_silver/Files/dbt`, target: `wh_gold`) | `7c1b6a07-ed63-4da8-b1db-8af767a994e6` |
-| Semantic model | `Retail Promotions` (Direct Lake on the `wh_gold` SQL endpoint) | `1eecc8d6-15dd-4bbb-b842-e06faf4996d1` |
-| Report | `Retail Promotions Analysis` (5 pages) | `102e25f6-04fb-4fbf-ae4c-98ccd248cf06` |
-| Deployment pipeline | `dunnhumby-promo` (Development → Production) | `d8db794c-f708-49c4-b9e9-a0585bf5ca7a` |
+Details, set-up and run instructions: [technical guide](docs/technical_guide.md) ·
+model design: [star schema](docs/star_schema.md).
 
-Dev SQL endpoint (Warehouse and both Lakehouses): `63lxcuql4fvu7iqtjpgd6no5fq-m7obfmaxqyaubhrmq7fc2hbezi.datawarehouse.fabric.microsoft.com`
+## Data notes
 
-## Repo layout
+- The data has relative days and weeks, not calendar dates; day 1 is anchored to a date only to draw timelines.
+- Only 801 of the 2,500 households have demographics. The rest are kept as "Unknown" rather than dropped.
+- Campaign results are an observational estimate, not a randomised test.
+- In 0.04% of promotion records the same product, store and week had conflicting codes; the row with the most
+  promotion was kept and the other logged.
 
-This project is the `Retail-Promotions-Analytics/` folder of
-[janjuas/Analytics-Projects](https://github.com/janjuas/Analytics-Projects). All paths below are relative to that folder,
-except the CI workflow, which GitHub requires at the repo root.
-
-```
-dbt/                 dbt project (dbt-fabric). profiles.yml is committed and holds no secrets.
-  models/staging/    1:1 views over lh_silver, renamed, with tests
-  models/marts/      core/ star schema (8 dimensions, 5 facts) and analysis/ marts behind the report
-fabric/              Fabric workspace items, synced by Git integration: notebooks, lakehouses, warehouse, dbt job
-infra/               IDs + scripts: upload_raw.py, sync_dbt_job.py, create_deployment_pipeline.sh, connect_git.sh
-powerbi-desktop/     Import-mode copy of the report for Power BI Desktop (see Power BI report)
-docs/star_schema.md  model design, analysis marts and tests
-../.github/workflows/retail-promotions-dbt.yml   CI: parse on every PR; on merge, publish to Fabric and run the dbt job
-```
-
-## Local setup
-
-```bash
-python -m venv .venv
-.venv/Scripts/pip install -r requirements.txt
-az login                                   # the dbt dev target authenticates with the Azure CLI session
-```
-
-Running dbt locally also needs **Microsoft ODBC Driver 18 for SQL Server**:
-
-```bash
-winget install --id Microsoft.msodbcsql.18 -e
-```
-
-Then:
-
-```bash
-cd dbt
-../.venv/Scripts/dbt deps --profiles-dir .
-../.venv/Scripts/dbt debug --profiles-dir .
-../.venv/Scripts/dbt build --profiles-dir .          # runs models + tests
-../.venv/Scripts/dbt docs generate --profiles-dir . && ../.venv/Scripts/dbt docs serve --profiles-dir .
-```
-
-## Running dbt inside Fabric (dbt job)
-
-The Fabric **dbt job** `dbt_promo_star_schema` runs this project on Fabric's managed dbt runtime, so nothing has to
-be installed to build gold. The runtime uses dbt-core 1.11 and dbt-fabric 1.10, slightly older than the local
-1.12 / 1.11.
-
-| Setting | Lives in | Set by |
-|---|---|---|
-| Project files | `lh_silver` → `Files/dbt` (job setting: project type `Lakehouse`, folder `dbt`) | `infra/sync_dbt_job.py` (locally, or from CI on merge to `main`) |
-| Target profile (`wh_gold`, schema `Gold_DH`) | job's **dbt configurations** | Fabric UI. The **connection** field there is the *target* dbt builds into, so it must stay `wh_gold`. |
-| Command (`build` / `run` / `test`, select, exclude, threads) | job definition | `sync_dbt_job.py --operation/--select/...` or the UI |
-| Schedule | job's **Schedule** tab | Fabric UI |
-
-Runtime notes:
-- **Fabric marks a run "Failed" when dbt reports any warning**, even with `ERROR=0`. `sync_dbt_job.py --run` reads the run's `Output/<run id>/logs/dbt.log` and passes or fails on dbt's own `Done.` summary instead.
-- **No `persist_docs`**: Fabric Warehouse has no table or column comments, so it errors with `alter_column_comment macro not implemented`.
-- **Dot-folders break the project download.** The script skips them and uploads only the macros of `dbt_packages/`.
-- Each run's compiled SQL and `dbt.log` are kept in the job's OneLake storage under `Output/<run id>/`.
-
-```bash
-.venv/Scripts/python infra/sync_dbt_job.py          # publish dbt/ to the Lakehouse folder
-.venv/Scripts/python infra/sync_dbt_job.py --run    # publish, run the job in Fabric, wait, exit 1 on failure
-.venv/Scripts/python infra/sync_dbt_job.py --run --select campaign_effect   # build and test one model
-```
-
-`--select` applies to that run only; the next run without it builds the whole project again.
-
-Models still build into `staging` and `marts` because of `macros/generate_schema_name.sql`. The profile schema
-(`Gold_DH`) is only used for anything without a custom schema.
-
-The project is published to a Lakehouse folder rather than edited inside the job, so CI can update it on every
-merge and Git stays the single source of truth.
-
-## Power BI report
-
-`Retail Promotions Analysis` is a thin report on the `Retail Promotions` semantic model, which reads `wh_gold`
-in **Direct Lake on SQL** mode through the Warehouse's SQL endpoint (no import or scheduled refresh; it reads the
-Warehouse's Delta tables directly).
-Both are in `fabric/` and versioned through Fabric Git integration.
-
-**Model:** 18 tables (5 facts, 8 dimensions, 5 analysis tables), 19 single-direction relationships, 42 measures
-with formats, descriptions and display folders. Keys, sort columns and raw numeric columns are hidden behind
-measures. `Date` is the marked date table and filters `Week`, so one week slicer filters daily and weekly facts.
-
-| Page | Question it answers | Main visuals |
-|---|---|---|
-| Overview | Headline performance | 6 KPIs, weekly sales, top 10 departments |
-| Promotions | Which mechanic earns its place, and where | Uplift by mechanic; department x mechanic matrix (cells with 100+ product-store pairs) |
-| Discounts and Private Label | Are discounts deep enough; is own-label growing | Units per line by depth band; private-label share year 1 vs 2 |
-| Campaigns | Did campaigns lift spend against comparable households | Matched vs unmatched lift by campaign type; campaign detail |
-| Customers | Which segments are most valuable and promotion-sensitive | Sales per household matrix (income x composition); coupon use by income |
-
-Each page states its main caveat in the subtitle. Product-level pages are filtered to merchandise.
-
-### Power BI Desktop version
-
-`powerbi-desktop/Retail Analysis.pbip` is the same five pages on a local **Import** model, for opening in
-Power BI Desktop without the Fabric report. It reads `wh_gold` through the OneLake catalog (Fabric Warehouse
-connector); the workspace and warehouse are the `WorkspaceId` and `WarehouseId` parameters, so pointing it at prod
-is a parameter change.
-
-- 14 tables: the ones the report uses. The 38.6M-row `fct_promo_exposure_weekly` is replaced by `Promotion Week`,
-  which counts product-store-weeks per display code, mailer code and promoted flag (merchandise only). The
-  Warehouse does that aggregation at refresh.
-- To use it: open the `.pbip`, click **Refresh** and sign in with an organisational account that can read `wh_gold`.
-  The data cache and user settings are not committed, so the first open is empty until refreshed.
-
-## Re-loading data
-
-```bash
-.venv/Scripts/python infra/upload_raw.py --source "<folder with the CSVs>"
-```
-Then run `nb_01_bronze_ingest` and `nb_02_silver_clean` in the dev workspace (both have a `tables` parameter for partial reloads).
-
-## GitHub integration (set-up)
-
-1. Turn on the tenant setting **Users can sync workspace items with GitHub repositories** (Admin portal → Tenant settings → Git integration). `Retail-Promotions-Analytics/fabric` must exist on `main` in `janjuas/Analytics-Projects`.
-2. Create a fine-grained PAT scoped to `Analytics-Projects` with **Contents: Read and write**.
-3. In Fabric go to **Settings → Manage connections and gateways → New → Cloud → GitHub - Source control**, paste the PAT and save. Copy the connection ID.
-4. Run `bash infra/connect_git.sh <connection-id>`. This connects `dunnhumby-promo-dev` to `main:/Retail-Promotions-Analytics/fabric` and commits the workspace items.
-5. On GitHub, protect `main`: **Settings → Branches → Add rule** → require a pull request, and require the `parse` status check from the *Retail Promotions - dbt* workflow.
-
-Day-to-day work: branch, change dbt or notebooks, open a PR, CI parses it, merge, then click **Update all** in the dev workspace's Source control panel.
-
-## Promote to prod
-
-Open the `dunnhumby-promo` deployment pipeline and click **Deploy** from Development to Production. This copies the
-notebooks, the Lakehouse definitions and the Warehouse schema, but **not data**. After deploying:
-
-1. Upload the raw files to prod (`upload_raw.py --env prod` once you have added the prod `lh_bronze_id` to `infra/config.json`), then run both notebooks in prod. They find their Lakehouses by name, so they work without edits.
-2. In the prod copy of `dbt_promo_star_schema`, open **dbt configurations** and point the profile at the **prod** `wh_gold` and the project source at the **prod** `lh_silver` → `Files/dbt`. Deployment rules don't cover dbt jobs yet, so check that it doesn't still point at dev. Add the prod job's ID (`dbt_job_id`) to `infra/config.json`, then run `sync_dbt_job.py --env prod --run`, or the CI workflow manually with `env: prod`.
-
-## CI (GitHub Actions)
-
-- **Every PR:** `dbt parse`. Needs no credentials.
-- **Merge to `main`:** publishes `dbt/` to `lh_silver/Files/dbt`, runs the Fabric dbt job (`dbt build`) and fails the workflow if any model or test fails.
-- **Manual run:** the same as a merge, for `dev` or `prod`, with a choice of dbt command.
-
-The merge and manual jobs need a service principal:
-
-1. Entra ID → App registrations → new app → create a client secret.
-2. Fabric admin portal → Tenant settings → turn on **Service principals can use Fabric APIs**.
-3. Add the app as **Contributor** on both workspaces. That covers writing the Lakehouse files and starting the job. The job itself still connects to the Warehouse with the OAuth connection saved in the UI.
-4. GitHub repo → Settings → Secrets: `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`. Variable: `FABRIC_CI_ENABLED=true`. Environments: `development` and `production`; add required reviewers on `production` for a manual gate.
-
-Running dbt locally against `wh_gold` (`dbt build` with `profiles.yml`) still works and needs ODBC Driver 18, see Local setup.
-
-## Data quality notes
-
-- **`hh_demographic` headers are anonymised** in this copy: `classification_1..5`. Silver gives them descriptive names inferred from the original public release of this dataset, whose value sets match: 1 = age, 2 = marital status (X/Y/Z), 3 = income (Level1–12), 4 = household size, 5 = household composition. The bundled user guide only describes them as ordinal segments, and the band values stay anonymised.
-- **Demographics cover only 801 of the 2,500 households.** Household analysis keeps the other 1,699 as `Unknown` rather than dropping them.
-- **`causal_data` has 15,245 product/store/week keys that appear twice with conflicting display/mailer codes** (0.04%). Silver keeps the row showing the most promotion exposure and writes the other to `lh_silver._rejects` with `reason = 'duplicate_key'`.
-- **Time is relative:** `DAY` 1–711 and `WEEK_NO` 1–102 have no calendar dates. Day 1 is anchored to a calendar date through `var('day_one_date')`.
-- Discounts (`RETAIL_DISC`, `COUPON_DISC`, `COUPON_MATCH_DISC`) are stored as zero or negative numbers, except for **10 lines with a positive `RETAIL_DISC`**. Most are quantity-0 lines where the discount equals the sales value, which look like refunds or price corrections. The `accepted_range` test warns on them and fails only if there are more than 50.
+Source: dunnhumby, *The Complete Journey*.

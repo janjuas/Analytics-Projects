@@ -4,19 +4,19 @@ table Sales
 
 	/// Amount the retailer received, after loyalty discount and coupon match.
 	measure 'Total Sales Value' = SUM(Sales[Sales Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Sales
 		lineageTag: d637af0f-8904-43f6-9655-4daa6e0b105d
 
 	/// Value at regular shelf price, before loyalty discount and coupon match.
 	measure 'Total Shelf Value' = SUM(Sales[Shelf Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Sales
 		lineageTag: 543980a8-97ba-48e7-931c-12dc93f63ea9
 
 	/// Amount customers paid, after manufacturer coupons.
 	measure 'Customer Paid' = SUM(Sales[Customer Paid Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Sales
 		lineageTag: 5f91e1fa-f666-48cc-aa5c-ee4130e7dae4
 
@@ -40,13 +40,13 @@ table Sales
 
 	/// Loyalty-card discount given, as a positive amount.
 	measure 'Loyalty Discount' = SUM(Sales[Loyalty Discount Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Discounts
 		lineageTag: 889ff926-c362-4006-b92f-0020d5681f16
 
 	/// Manufacturer coupon discount used, as a positive amount.
 	measure 'Coupon Discount' = SUM(Sales[Coupon Discount Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Discounts
 		lineageTag: f7b1a358-0191-4942-b2ce-7af326acdd49
 

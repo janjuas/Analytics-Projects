@@ -41,7 +41,7 @@ jobs:
       - run: dbt parse
 
   # Merge to main (or manual): publish dbt/ to Fabric, run the dbt job, fail on any model or test error.
-  # Requires the service-principal secrets and FABRIC_CI_ENABLED=true (see README > CI).
+  # Requires the service-principal secrets and FABRIC_CI_ENABLED=true (see Retail-Promotions-Analytics/docs/technical_guide.md > CI).
   fabric-dbt-job:
     needs: parse
     if: ${{ github.event_name != 'pull_request' && vars.FABRIC_CI_ENABLED == 'true' }}

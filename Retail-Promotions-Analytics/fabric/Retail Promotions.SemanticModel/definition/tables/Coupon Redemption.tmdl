@@ -8,7 +8,7 @@ table 'Coupon Redemption'
 
 	/// Coupon discount on same-day purchases of the coupon's eligible products.
 	measure 'Redeemed Coupon Value' = SUM('Coupon Redemption'[Redeemed Discount Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Campaigns
 
 	column 'Household Key'

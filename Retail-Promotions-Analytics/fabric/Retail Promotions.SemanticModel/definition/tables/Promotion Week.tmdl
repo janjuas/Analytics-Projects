@@ -8,7 +8,7 @@ table 'Promotion Week'
 
 	/// Sales value in tracked product-store-weeks.
 	measure 'Promotion Week Sales' = SUM('Promotion Week'[Week Sales Value])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Promotions
 
 	/// Number of tracked product-store-weeks.

@@ -10,13 +10,13 @@ table 'Campaign Effect'
 
 	/// Spend-matched difference-in-differences in sales per household.
 	measure 'Lift per Household' = DIVIDE(SUMX('Campaign Effect', 'Campaign Effect'[Lift per Household Value] * 'Campaign Effect'[Active Targeted Households]), SUM('Campaign Effect'[Active Targeted Households]))
-		formatString: $#,##0.00
+		formatString: £#,##0.00
 		displayFolder: Campaign Effect
 		lineageTag: 2c018acc-e65d-4ab1-b911-7b2ca900f818
 
 	/// The same comparison against all non-targeted households, without spend matching.
 	measure 'Unmatched Lift per Household' = DIVIDE(SUMX('Campaign Effect', 'Campaign Effect'[Unmatched Lift per Household Value] * 'Campaign Effect'[Active Targeted Households]), SUM('Campaign Effect'[Active Targeted Households]))
-		formatString: $#,##0.00
+		formatString: £#,##0.00
 		displayFolder: Campaign Effect
 		lineageTag: fba87ebb-b39d-4604-86f6-c1ae37a37eb8
 

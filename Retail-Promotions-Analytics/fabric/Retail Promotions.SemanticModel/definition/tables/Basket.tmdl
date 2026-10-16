@@ -8,7 +8,7 @@ table Basket
 
 	/// Average sales value per shopping trip.
 	measure 'Average Basket Value' = DIVIDE(SUM(Basket[Basket Sales Value]), [Baskets])
-		formatString: $#,##0.00
+		formatString: £#,##0.00
 		displayFolder: Baskets
 
 	/// Average units per shopping trip.

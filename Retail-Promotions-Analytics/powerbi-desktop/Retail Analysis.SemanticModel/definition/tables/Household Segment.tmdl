@@ -10,13 +10,13 @@ table 'Household Segment'
 
 	/// Average two-year spend per household.
 	measure 'Sales per Household' = DIVIDE(SUMX('Household Segment', 'Household Segment'[Sales per Household Value] * 'Household Segment'[Households]), [Segment Households])
-		formatString: $#,##0
+		formatString: £#,##0
 		displayFolder: Segments
 		lineageTag: e4fde9d4-13cf-45e2-8c52-b8239e20cc29
 
 	/// Average basket value, averaged per household.
 	measure 'Segment Basket Value' = DIVIDE(SUMX('Household Segment', 'Household Segment'[Avg Basket Value] * 'Household Segment'[Households]), [Segment Households])
-		formatString: $#,##0.00
+		formatString: £#,##0.00
 		displayFolder: Segments
 		lineageTag: 6e7f834f-b5f9-49ba-9aae-d9a02ab4a849
 
