@@ -1,0 +1,104 @@
+/// One row per marketing campaign (30).
+table Campaign
+	lineageTag: 150d1c15-ca67-46a3-9dca-cb1150791b3d
+
+	column 'Campaign Key'
+		dataType: string
+		isHidden
+		lineageTag: d47c6198-8581-415f-9da9-6153afeedc9b
+		summarizeBy: none
+		sourceColumn: campaign_sk
+
+	column 'Campaign ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: bc070207-361c-4210-b719-a1038cc5fed3
+		summarizeBy: none
+		sourceColumn: campaign_id
+
+	column 'Campaign Type'
+		dataType: string
+		lineageTag: 2ac1c565-ef31-4ea2-8af6-e462ac89c212
+		summarizeBy: none
+		sourceColumn: campaign_type
+
+	column 'Campaign Type Description'
+		dataType: string
+		lineageTag: 0341e264-58e0-4637-87a0-c9ac8428ab36
+		summarizeBy: none
+		sourceColumn: campaign_type_description
+
+	column 'Start Date'
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		lineageTag: 895ddbe3-c5fc-42a5-b950-53eaad425c8c
+		summarizeBy: none
+		sourceColumn: start_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'End Date'
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		lineageTag: 54be02f8-5cba-4bb0-876e-8e4201b0fb57
+		summarizeBy: none
+		sourceColumn: end_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Duration Days'
+		dataType: int64
+		formatString: 0
+		lineageTag: a9243669-a841-4b4d-b296-df62a7aa1e0e
+		summarizeBy: none
+		sourceColumn: duration_days
+
+	column 'Households Targeted'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8c8f9ea1-3f6f-4414-bf14-d6ad5f03e0f0
+		summarizeBy: none
+		sourceColumn: households_targeted
+
+	column 'Coupons in Pool'
+		dataType: int64
+		formatString: 0
+		lineageTag: 59122550-0ce4-4be9-89d6-99e68c072c92
+		summarizeBy: none
+		sourceColumn: coupons_in_pool
+
+	column start_day_number
+		dataType: int64
+		formatString: 0
+		lineageTag: 88bef2cb-64d4-47a8-aa64-03e03756cdf4
+		summarizeBy: none
+		sourceColumn: start_day_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_day_number
+		dataType: int64
+		formatString: 0
+		lineageTag: 044ecb70-e74c-47aa-ac1e-194d3a789443
+		summarizeBy: none
+		sourceColumn: end_day_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column eligible_products
+		dataType: int64
+		formatString: 0
+		lineageTag: 637d31a6-0ec9-41ae-a7c8-f40e98e1fcf3
+		summarizeBy: none
+		sourceColumn: eligible_products
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Campaign = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="marts", Item="dim_campaign"]}[Data]
+				in
+					Data
+

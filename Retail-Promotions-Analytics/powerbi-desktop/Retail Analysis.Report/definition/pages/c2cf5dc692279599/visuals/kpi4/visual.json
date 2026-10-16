@@ -1,0 +1,57 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "2965e02d4a72e751",
+  "position": {
+    "x": 960,
+    "y": 132,
+    "z": 0,
+    "height": 140,
+    "width": 296,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Campaign Redemption Rate %"
+                }
+              },
+              "queryRef": "Campaign Effect.Campaign Redemption Rate %",
+              "nativeQueryRef": "Campaign Redemption Rate %",
+              "displayName": "Redemption rate"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Campaign Effect"
+                  }
+                },
+                "Property": "Campaign Redemption Rate %"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

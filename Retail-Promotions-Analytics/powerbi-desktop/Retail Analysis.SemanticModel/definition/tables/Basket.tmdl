@@ -1,0 +1,184 @@
+/// One row per shopping trip (276k baskets).
+table Basket
+	lineageTag: 6739ed85-1d7a-404e-bcdc-cb777d68e5dd
+
+	/// Number of shopping trips.
+	measure Baskets = COUNTROWS(Basket)
+		formatString: #,##0
+		displayFolder: Baskets
+		lineageTag: e797f506-3236-4268-82c2-ed128578eb9f
+
+	/// Average sales value per shopping trip.
+	measure 'Average Basket Value' = DIVIDE(SUM(Basket[Basket Sales Value]), [Baskets])
+		formatString: $#,##0.00
+		displayFolder: Baskets
+		lineageTag: af6fae3f-ee9f-4b1f-9d72-a74959062a0a
+
+	/// Average units per shopping trip.
+	measure 'Items per Basket' = DIVIDE(SUM(Basket[Item Quantity]), [Baskets])
+		formatString: #,##0.0
+		displayFolder: Baskets
+		lineageTag: 5459d480-7b44-4237-9f6a-9add9715424d
+
+	/// Share of shopping trips using at least one manufacturer coupon.
+	measure 'Coupon Basket %' = DIVIDE(CALCULATE([Baskets], Basket[Has Coupon] = 1), [Baskets])
+		formatString: 0.0%
+		displayFolder: Baskets
+		lineageTag: 0facc718-feeb-44ea-ada9-f406261e427d
+
+	column 'Household Key'
+		dataType: string
+		isHidden
+		lineageTag: c4863a5f-fbb1-4863-a4e9-cab1880d735b
+		summarizeBy: none
+		sourceColumn: household_sk
+
+	column 'Store Key'
+		dataType: string
+		isHidden
+		lineageTag: 871f41f6-6769-4e70-826d-33523da47943
+		summarizeBy: none
+		sourceColumn: store_sk
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 790badf3-4b42-46ff-b8d2-0d66af51d00d
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column 'Item Quantity'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 509a99ed-420a-4233-9138-4b6fe8bcbf7c
+		summarizeBy: sum
+		sourceColumn: item_quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Distinct Products'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9a835e29-91e7-4914-af1a-e2bfaa0f6732
+		summarizeBy: sum
+		sourceColumn: distinct_products
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Basket Sales Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 82c922af-26a1-4cb7-aa48-07cf11362cc6
+		summarizeBy: sum
+		sourceColumn: sales_value
+
+		annotation SummarizationSetBy = Automatic
+
+	/// 1 when any line in the basket used a manufacturer coupon.
+	column 'Has Coupon'
+		dataType: int64
+		formatString: 0
+		lineageTag: cfd03cc9-2cd4-46c1-9d35-2764acae83f7
+		summarizeBy: sum
+		sourceColumn: has_coupon
+
+		annotation SummarizationSetBy = Automatic
+
+	column basket_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 89ce2a2a-0e1b-4be1-bb87-a5f4e48d2738
+		summarizeBy: sum
+		sourceColumn: basket_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column week_number
+		dataType: int64
+		formatString: 0
+		lineageTag: b3bd72f0-9275-4488-bd18-fcd4112f83da
+		summarizeBy: sum
+		sourceColumn: week_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column basket_time_hhmm
+		dataType: int64
+		formatString: 0
+		lineageTag: 17b4529b-017f-438d-875c-b13335f49ff3
+		summarizeBy: sum
+		sourceColumn: basket_time_hhmm
+
+		annotation SummarizationSetBy = Automatic
+
+	column line_count
+		dataType: int64
+		formatString: 0
+		lineageTag: ec64bd38-3d8d-4723-9db1-cfb07968e133
+		summarizeBy: sum
+		sourceColumn: line_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column shelf_value
+		dataType: double
+		lineageTag: 5a85b4fe-6504-44d6-8658-4660f7ac947a
+		summarizeBy: sum
+		sourceColumn: shelf_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column customer_paid_value
+		dataType: double
+		lineageTag: 7318b01f-65e1-4635-9445-100ada97eaee
+		summarizeBy: sum
+		sourceColumn: customer_paid_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column loyalty_discount_value
+		dataType: double
+		lineageTag: 65647865-b775-4ff6-abd6-32038f5d649e
+		summarizeBy: sum
+		sourceColumn: loyalty_discount_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column coupon_discount_value
+		dataType: double
+		lineageTag: f5f09c6e-ee7e-4832-bab5-536fca72da6c
+		summarizeBy: sum
+		sourceColumn: coupon_discount_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column loyalty_discount_share
+		dataType: double
+		lineageTag: b01d999d-321f-4998-ab5f-b3f67071b47d
+		summarizeBy: sum
+		sourceColumn: loyalty_discount_share
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Basket = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="marts", Item="fct_basket"]}[Data]
+				in
+					Data
+

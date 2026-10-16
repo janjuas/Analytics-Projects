@@ -1,0 +1,123 @@
+/// Study calendar, one row per study day (1-719). Day 1 is anchored on Wednesday 3 Jan 2018; the source has day numbers only.
+table Date
+	lineageTag: c8b35e71-ce62-4e6c-b6e6-d895ea78fcf3
+	dataCategory: Time
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3ea3df61-388e-45c8-a3c6-cc827be2439e
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: dd mmm yyyy
+		lineageTag: e3f73e93-84f1-4672-ae63-c3701746f039
+		summarizeBy: none
+		sourceColumn: calendar_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Source DAY, 1-719.
+	column 'Study Day'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3104437b-5c5f-4d08-b907-3152f88a9891
+		summarizeBy: none
+		sourceColumn: day_number
+
+	/// Source WEEK_NO.
+	column 'Week Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9e64e29d-0e5b-4d99-b723-8dc708b6c992
+		summarizeBy: none
+		sourceColumn: week_number
+
+	column 'Week Start'
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		lineageTag: 5e9590eb-6309-43d2-a553-5b34189166e1
+		summarizeBy: none
+		sourceColumn: week_start_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Day of Week Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2a081c7c-178d-4ff1-8735-b95d79761d6d
+		summarizeBy: none
+		sourceColumn: day_of_week_number
+
+	column 'Day of Week'
+		dataType: string
+		lineageTag: 8b845669-0f15-4d99-a31e-a28b1aa68549
+		summarizeBy: none
+		sourceColumn: day_of_week_name
+		sortByColumn: 'Day of Week Number'
+
+	column 'Is Weekend'
+		dataType: int64
+		formatString: 0
+		lineageTag: 001f6326-6e53-43c2-a567-210d4399699c
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+	column 'Month Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 56a2953b-cedd-411a-80a6-aadf7ae4db74
+		summarizeBy: none
+		sourceColumn: month_number
+
+	column Month
+		dataType: string
+		lineageTag: 908bdb11-bdf4-4ce0-aee3-305688371c24
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: 'Month Number'
+
+	column Quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: febca808-12df-4a66-8d75-70f7772f273f
+		summarizeBy: none
+		sourceColumn: quarter_number
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: a784a5b9-e403-4018-bdfb-248a15709663
+		summarizeBy: none
+		sourceColumn: calendar_year
+
+	/// 1 for days 1-365, 2 afterwards.
+	column 'Study Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: eeb17d2b-ed59-4c7d-a4ff-f1814a5e8f83
+		summarizeBy: none
+		sourceColumn: study_year
+
+	/// 1 for days with transaction history (1-711).
+	column 'In Transaction Window'
+		dataType: int64
+		formatString: 0
+		lineageTag: b3ce3df8-4676-48a5-bb56-c41ca112e247
+		summarizeBy: none
+		sourceColumn: is_in_transaction_window
+
+	partition Date = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="marts", Item="dim_date"]}[Data]
+				in
+					Data
+

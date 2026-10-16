@@ -1,0 +1,34 @@
+/// In-store display location codes from the dunnhumby user guide.
+table 'Display Location'
+	lineageTag: 0deca998-0ee5-4ded-97da-6ebfb55aedc4
+
+	column 'Display Code'
+		dataType: string
+		isHidden
+		lineageTag: 5b7f8aae-6552-421c-9066-70cd44301de9
+		summarizeBy: none
+		sourceColumn: display_code
+
+	column 'Display Location'
+		dataType: string
+		lineageTag: dd82cddb-dd1b-48bc-b1c5-a6f4f1140d79
+		summarizeBy: none
+		sourceColumn: display_location
+
+	column is_on_display
+		dataType: int64
+		formatString: 0
+		lineageTag: b5634c8b-d666-459a-af39-8786aeb1e039
+		summarizeBy: none
+		sourceColumn: is_on_display
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Display Location' = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="marts", Item="dim_display_location"]}[Data]
+				in
+					Data
+

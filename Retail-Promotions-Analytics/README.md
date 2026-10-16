@@ -27,6 +27,8 @@ Fabric deployment pipeline promotes items from dev to prod.
 | Notebook | `nb_01_bronze_ingest` | `34d77549-2c09-4864-bdee-d1cd16898462` |
 | Notebook | `nb_02_silver_clean` | `891a9c48-45c0-412f-a049-4f812b5e1a17` |
 | dbt job | `dbt_promo_star_schema` (project: `lh_silver/Files/dbt`, target: `wh_gold`) | `7c1b6a07-ed63-4da8-b1db-8af767a994e6` |
+| Semantic model | `Retail Promotions` (Direct Lake on the `wh_gold` SQL endpoint) | `1eecc8d6-15dd-4bbb-b842-e06faf4996d1` |
+| Report | `Retail Promotions Analysis` (5 pages) | `102e25f6-04fb-4fbf-ae4c-98ccd248cf06` |
 | Deployment pipeline | `dunnhumby-promo` (Development → Production) | `d8db794c-f708-49c4-b9e9-a0585bf5ca7a` |
 
 Dev SQL endpoint (Warehouse and both Lakehouses): `63lxcuql4fvu7iqtjpgd6no5fq-m7obfmaxqyaubhrmq7fc2hbezi.datawarehouse.fabric.microsoft.com`
@@ -40,10 +42,11 @@ except the CI workflow, which GitHub requires at the repo root.
 ```
 dbt/                 dbt project (dbt-fabric). profiles.yml is committed and holds no secrets.
   models/staging/    1:1 views over lh_silver, renamed, with tests
-  models/marts/      star schema (dim_product built; roadmap in docs/star_schema.md)
+  models/marts/      core/ star schema (8 dimensions, 5 facts) and analysis/ marts behind the report
 fabric/              Fabric workspace items, synced by Git integration: notebooks, lakehouses, warehouse, dbt job
 infra/               IDs + scripts: upload_raw.py, sync_dbt_job.py, create_deployment_pipeline.sh, connect_git.sh
-docs/star_schema.md  target model design, planned analyses and tests
+powerbi-desktop/     Import-mode copy of the report for Power BI Desktop (see Power BI report)
+docs/star_schema.md  model design, analysis marts and tests
 ../.github/workflows/retail-promotions-dbt.yml   CI: parse on every PR; on merge, publish to Fabric and run the dbt job
 ```
 
@@ -103,6 +106,40 @@ Models still build into `staging` and `marts` because of `macros/generate_schema
 
 The project is published to a Lakehouse folder rather than edited inside the job, so CI can update it on every
 merge and Git stays the single source of truth.
+
+## Power BI report
+
+`Retail Promotions Analysis` is a thin report on the `Retail Promotions` semantic model, which reads `wh_gold`
+in **Direct Lake on SQL** mode through the Warehouse's SQL endpoint (no import or scheduled refresh; it reads the
+Warehouse's Delta tables directly).
+Both are in `fabric/` and versioned through Fabric Git integration.
+
+**Model:** 18 tables (5 facts, 8 dimensions, 5 analysis tables), 19 single-direction relationships, 42 measures
+with formats, descriptions and display folders. Keys, sort columns and raw numeric columns are hidden behind
+measures. `Date` is the marked date table and filters `Week`, so one week slicer filters daily and weekly facts.
+
+| Page | Question it answers | Main visuals |
+|---|---|---|
+| Overview | Headline performance | 6 KPIs, weekly sales, top 10 departments |
+| Promotions | Which mechanic earns its place, and where | Uplift by mechanic; department x mechanic matrix (cells with 100+ product-store pairs) |
+| Discounts and Private Label | Are discounts deep enough; is own-label growing | Units per line by depth band; private-label share year 1 vs 2 |
+| Campaigns | Did campaigns lift spend against comparable households | Matched vs unmatched lift by campaign type; campaign detail |
+| Customers | Which segments are most valuable and promotion-sensitive | Sales per household matrix (income x composition); coupon use by income |
+
+Each page states its main caveat in the subtitle. Product-level pages are filtered to merchandise.
+
+### Power BI Desktop version
+
+`powerbi-desktop/Retail Analysis.pbip` is the same five pages on a local **Import** model, for opening in
+Power BI Desktop without the Fabric report. It reads `wh_gold` through the OneLake catalog (Fabric Warehouse
+connector); the workspace and warehouse are the `WorkspaceId` and `WarehouseId` parameters, so pointing it at prod
+is a parameter change.
+
+- 14 tables: the ones the report uses. The 38.6M-row `fct_promo_exposure_weekly` is replaced by `Promotion Week`,
+  which counts product-store-weeks per display code, mailer code and promoted flag (merchandise only). The
+  Warehouse does that aggregation at refresh.
+- To use it: open the `.pbip`, click **Refresh** and sign in with an organisational account that can read `wh_gold`.
+  The data cache and user settings are not committed, so the first open is empty until refreshed.
 
 ## Re-loading data
 

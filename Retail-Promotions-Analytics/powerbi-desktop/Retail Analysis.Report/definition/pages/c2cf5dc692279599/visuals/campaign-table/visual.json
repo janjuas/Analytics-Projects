@@ -1,0 +1,182 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "057da3b8f49d201d",
+  "position": {
+    "x": 540,
+    "y": 288,
+    "z": 0,
+    "height": 408,
+    "width": 716,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign"
+                    }
+                  },
+                  "Property": "Campaign ID"
+                }
+              },
+              "queryRef": "Campaign.Campaign ID",
+              "nativeQueryRef": "Campaign ID",
+              "displayName": "Campaign"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign"
+                    }
+                  },
+                  "Property": "Campaign Type"
+                }
+              },
+              "queryRef": "Campaign.Campaign Type",
+              "nativeQueryRef": "Campaign Type",
+              "displayName": "Type"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign"
+                    }
+                  },
+                  "Property": "Duration Days"
+                }
+              },
+              "queryRef": "Campaign.Duration Days",
+              "nativeQueryRef": "Duration Days",
+              "displayName": "Days"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Is Small Campaign"
+                }
+              },
+              "queryRef": "Campaign Effect.Is Small Campaign",
+              "nativeQueryRef": "Is Small Campaign",
+              "displayName": "Small (<30 hh)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Campaign Lift %"
+                }
+              },
+              "queryRef": "Campaign Effect.Campaign Lift %",
+              "nativeQueryRef": "Campaign Lift %",
+              "displayName": "Campaign lift"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Lift per Household"
+                }
+              },
+              "queryRef": "Campaign Effect.Lift per Household",
+              "nativeQueryRef": "Lift per Household",
+              "displayName": "Matched lift"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Campaign Redemption Rate %"
+                }
+              },
+              "queryRef": "Campaign Effect.Campaign Redemption Rate %",
+              "nativeQueryRef": "Campaign Redemption Rate %",
+              "displayName": "Redemption rate"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Campaign Effect"
+                  }
+                },
+                "Property": "Campaign Lift %"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Campaign detail'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

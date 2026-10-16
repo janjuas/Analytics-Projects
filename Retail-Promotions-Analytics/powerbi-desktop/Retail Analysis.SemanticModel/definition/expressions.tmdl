@@ -1,0 +1,20 @@
+expression WorkspaceId = "b012dc67-8617-4001-9e2c-87ca2d1c24ca" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 020eaeac-19d2-4806-920d-c00f9f4e37b2
+
+	annotation PBI_ResultType = Text
+
+expression WarehouseId = "f2e91e90-11a1-4eed-8d5d-b2c59e034c22" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: c01d7958-eb85-4ad3-a3b1-507f1f13d9e7
+
+	annotation PBI_ResultType = Text
+
+/// wh_gold through the OneLake catalog (Fabric Warehouse connector); every table reads from here
+expression wh_gold =
+		let
+			Source = Fabric.Warehouse([]),
+			Workspace = Source{[workspaceId = WorkspaceId]}[Data],
+			Warehouse = Workspace{[warehouseId = WarehouseId]}[Data]
+		in
+			Warehouse
+	lineageTag: c81f8729-9948-4e1d-9ae8-0fc2f0724ac6
+

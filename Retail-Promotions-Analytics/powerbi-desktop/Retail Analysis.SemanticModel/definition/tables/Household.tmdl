@@ -1,0 +1,150 @@
+/// One row per household (2,500). The 1,699 households without demographics have Unknown bands.
+table Household
+	lineageTag: 2df760eb-5bdd-4fa1-815c-43dffba0f7ff
+
+	/// Households in the panel.
+	measure 'Household Count' = COUNTROWS(Household)
+		formatString: #,##0
+		displayFolder: Households
+		lineageTag: e100f575-1953-4268-bf49-05b7ede2d317
+
+	column 'Household Key'
+		dataType: string
+		isHidden
+		lineageTag: 8f44cc21-5c2d-407d-96d9-872792e0ee25
+		summarizeBy: none
+		sourceColumn: household_sk
+
+	column 'Has Demographics'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6a862b4a-2cf1-47b4-8f1f-8306f70b61c4
+		summarizeBy: none
+		sourceColumn: has_demographics
+
+	column 'Age Band'
+		dataType: string
+		lineageTag: c979ced4-7d1c-4e94-9f98-a553df7ca2a2
+		summarizeBy: none
+		sourceColumn: age_band
+		sortByColumn: 'Age Band Sort'
+
+	/// Level1-12, ordinal (anonymised).
+	column 'Income Band'
+		dataType: string
+		lineageTag: f9d8fe52-bba5-4913-9419-598135d026c8
+		summarizeBy: none
+		sourceColumn: income_band
+		sortByColumn: 'Income Band Sort'
+
+	column 'Household Size'
+		dataType: string
+		lineageTag: 04b352d4-053f-4e4e-a814-9f02619dda00
+		summarizeBy: none
+		sourceColumn: household_size
+		sortByColumn: 'Household Size Sort'
+
+	/// Group1-6, ordinal (anonymised).
+	column 'Household Composition'
+		dataType: string
+		lineageTag: 48462fcf-0581-4f02-bd66-8df50a8b5d88
+		summarizeBy: none
+		sourceColumn: household_composition
+		sortByColumn: 'Household Composition Sort'
+
+	column 'Homeowner Status'
+		dataType: string
+		lineageTag: 3da0b806-4227-4fed-8ed4-3526e3a1b70c
+		summarizeBy: none
+		sourceColumn: homeowner_status
+
+	column Children
+		dataType: string
+		lineageTag: 4af3f7d2-e267-437d-a921-293fded5d9b9
+		summarizeBy: none
+		sourceColumn: children_band
+		sortByColumn: 'Children Sort'
+
+	column 'Age Band Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 013336db-b010-4d40-8af9-a0cb6820a82a
+		summarizeBy: none
+		sourceColumn: age_band_sort
+
+	column 'Income Band Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0bb91b5f-1fde-40b4-b5ab-3763dc0c5d0f
+		summarizeBy: none
+		sourceColumn: income_band_sort
+
+	column 'Household Size Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: be928cc7-fe4a-41e5-8458-d5a963efe3f7
+		summarizeBy: none
+		sourceColumn: household_size_sort
+
+	column 'Household Composition Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d3c31ee1-87df-4bed-94b4-c89446113882
+		summarizeBy: none
+		sourceColumn: household_composition_sort
+
+	column 'Children Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e64c0b63-8ef5-41d9-bd59-33df6a2d0d1b
+		summarizeBy: none
+		sourceColumn: children_band_sort
+
+	column household_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 64f5df1d-3a2c-49d7-ae0b-3396df36f75f
+		summarizeBy: sum
+		sourceColumn: household_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column marital_status_code
+		dataType: string
+		lineageTag: c5dad2a2-aa6e-486f-8efa-cb92d3c8b179
+		summarizeBy: none
+		sourceColumn: marital_status_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_purchase_day
+		dataType: int64
+		formatString: 0
+		lineageTag: dd4b076a-3bbc-47ca-88c8-08635ee32a1c
+		summarizeBy: sum
+		sourceColumn: first_purchase_day
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_purchase_day
+		dataType: int64
+		formatString: 0
+		lineageTag: af525d78-9fca-42c3-ad5d-efac2f691121
+		summarizeBy: sum
+		sourceColumn: last_purchase_day
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Household = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="marts", Item="dim_household"]}[Data]
+				in
+					Data
+

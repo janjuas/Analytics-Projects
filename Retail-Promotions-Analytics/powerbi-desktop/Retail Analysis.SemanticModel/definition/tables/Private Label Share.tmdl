@@ -1,0 +1,86 @@
+/// Pre-aggregated: private-label share of sales by department, study year 1 vs. 2 (merchandise only).
+table 'Private Label Share'
+	lineageTag: 7775a852-68cc-4b3a-a5c8-4cdb40dcf71d
+
+	/// Private-label share of sales in study year 1.
+	measure 'Private Share Year 1 %' = DIVIDE(SUMX('Private Label Share', 'Private Label Share'[Private Share Year 1 Value] * 'Private Label Share'[Sales Value Year 1]), SUM('Private Label Share'[Sales Value Year 1]))
+		formatString: 0.0%
+		displayFolder: Private Label
+		lineageTag: e04c7ef6-90bc-4d5c-9185-6397f08c9d0b
+
+	/// Private-label share of sales in study year 2.
+	measure 'Private Share Year 2 %' = DIVIDE(SUMX('Private Label Share', 'Private Label Share'[Private Share Year 2 Value] * 'Private Label Share'[Sales Value Year 2]), SUM('Private Label Share'[Sales Value Year 2]))
+		formatString: 0.0%
+		displayFolder: Private Label
+		lineageTag: d6d17f43-51b0-4301-a198-52eb35b7f013
+
+	/// Change in private-label share from year 1 to year 2, in percentage points.
+	measure 'Private Share Change (pp)' = ([Private Share Year 2 %] - [Private Share Year 1 %]) * 100
+		formatString: +0.0;-0.0
+		displayFolder: Private Label
+		lineageTag: cce41d03-e949-4fca-953b-ae4782faac07
+
+	column Department
+		dataType: string
+		lineageTag: 0178efd8-b535-4944-b897-01890724efa2
+		summarizeBy: none
+		sourceColumn: department
+
+	column 'Sales Value Year 1'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 42e1c88e-c930-4818-b229-931a85cd68aa
+		summarizeBy: sum
+		sourceColumn: sales_value_y1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sales Value Year 2'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 653a9c83-2b22-46ba-b1be-ecb403801dc2
+		summarizeBy: sum
+		sourceColumn: sales_value_y2
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Private Share Year 1 Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: c146a0a3-e284-403a-a42b-69aea3082c33
+		summarizeBy: sum
+		sourceColumn: private_share_y1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Private Share Year 2 Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 136a2693-2c1f-467e-9877-e9b6511c922a
+		summarizeBy: sum
+		sourceColumn: private_share_y2
+
+		annotation SummarizationSetBy = Automatic
+
+	column share_change_pp
+		dataType: double
+		lineageTag: c8e202a2-24da-4e2d-ad3d-b5ccedf12b50
+		summarizeBy: sum
+		sourceColumn: share_change_pp
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Private Label Share' = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="analysis", Item="private_label_share"]}[Data]
+				in
+					Data
+

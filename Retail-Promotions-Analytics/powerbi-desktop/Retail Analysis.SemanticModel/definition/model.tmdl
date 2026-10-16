@@ -1,0 +1,33 @@
+model Model
+	culture: en-GB
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-GB
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+annotation PBI_QueryOrder = ["Sales","Basket","Date","Product","Household","Store","Campaign","Display Location","Promotion Uplift","Discount Depth","Campaign Effect","Household Segment","Private Label Share","Promotion Week","WorkspaceId","WarehouseId","wh_gold"]
+
+ref table Sales
+ref table Basket
+ref table Date
+ref table Product
+ref table Household
+ref table Store
+ref table Campaign
+ref table 'Display Location'
+ref table 'Promotion Uplift'
+ref table 'Discount Depth'
+ref table 'Campaign Effect'
+ref table 'Household Segment'
+ref table 'Private Label Share'
+ref table 'Promotion Week'
+
+ref cultureInfo en-GB
+

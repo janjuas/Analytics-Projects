@@ -1,0 +1,124 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "9ffdee92ecc8ece9",
+  "position": {
+    "x": 640,
+    "y": 288,
+    "z": 0,
+    "height": 408,
+    "width": 616,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Private Label Share"
+                    }
+                  },
+                  "Property": "Department"
+                }
+              },
+              "queryRef": "Private Label Share.Department",
+              "nativeQueryRef": "Department",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Private Label Share"
+                    }
+                  },
+                  "Property": "Private Share Year 1 %"
+                }
+              },
+              "queryRef": "Private Label Share.Private Share Year 1 %",
+              "nativeQueryRef": "Private Share Year 1 %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Private Label Share"
+                    }
+                  },
+                  "Property": "Private Share Year 2 %"
+                }
+              },
+              "queryRef": "Private Label Share.Private Share Year 2 %",
+              "nativeQueryRef": "Private Share Year 2 %"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Private Label Share"
+                  }
+                },
+                "Property": "Private Share Year 2 %"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Private-label share by department, year 1 vs year 2'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

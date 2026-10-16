@@ -1,0 +1,246 @@
+/// One row per product line in a basket (2.6M). Shelf value is the regular price before the loyalty discount and coupon match; customer paid is after any manufacturer coupon.
+table Sales
+	lineageTag: d13da065-4551-4f03-83b0-ac514c940cbd
+
+	/// Amount the retailer received, after loyalty discount and coupon match.
+	measure 'Total Sales Value' = SUM(Sales[Sales Value])
+		formatString: $#,##0
+		displayFolder: Sales
+		lineageTag: d637af0f-8904-43f6-9655-4daa6e0b105d
+
+	/// Value at regular shelf price, before loyalty discount and coupon match.
+	measure 'Total Shelf Value' = SUM(Sales[Shelf Value])
+		formatString: $#,##0
+		displayFolder: Sales
+		lineageTag: 543980a8-97ba-48e7-931c-12dc93f63ea9
+
+	/// Amount customers paid, after manufacturer coupons.
+	measure 'Customer Paid' = SUM(Sales[Customer Paid Value])
+		formatString: $#,##0
+		displayFolder: Sales
+		lineageTag: 5f91e1fa-f666-48cc-aa5c-ee4130e7dae4
+
+	/// Units sold. Filter Product[Is Merchandise] = 1 to exclude fuel, which is recorded in gallons.
+	measure 'Units Sold' = SUM(Sales[Quantity])
+		formatString: #,##0
+		displayFolder: Sales
+		lineageTag: d17c51e8-5538-49e7-9365-d4ff59c45050
+
+	/// Number of product lines purchased.
+	measure 'Sales Lines' = COUNTROWS(Sales)
+		formatString: #,##0
+		displayFolder: Sales
+		lineageTag: 116efb8f-8922-4c0a-9af0-a94d6185195b
+
+	/// Households with at least one purchase in the current filter context.
+	measure 'Shopping Households' = DISTINCTCOUNT(Sales[Household Key])
+		formatString: #,##0
+		displayFolder: Sales
+		lineageTag: aa107a69-fddb-45fa-bb3e-fd8507374f53
+
+	/// Loyalty-card discount given, as a positive amount.
+	measure 'Loyalty Discount' = SUM(Sales[Loyalty Discount Value])
+		formatString: $#,##0
+		displayFolder: Discounts
+		lineageTag: 889ff926-c362-4006-b92f-0020d5681f16
+
+	/// Manufacturer coupon discount used, as a positive amount.
+	measure 'Coupon Discount' = SUM(Sales[Coupon Discount Value])
+		formatString: $#,##0
+		displayFolder: Discounts
+		lineageTag: f7b1a358-0191-4942-b2ce-7af326acdd49
+
+	/// Loyalty discount as a share of shelf value (discount depth).
+	measure 'Loyalty Discount %' = DIVIDE([Loyalty Discount], [Total Shelf Value])
+		formatString: 0.0%
+		displayFolder: Discounts
+		lineageTag: d61edb70-c9e8-4842-9d53-62e8eb2a115d
+
+	/// Share of sales value from retailer private-label products.
+	measure 'Private Label Share %' = DIVIDE(CALCULATE([Total Sales Value], Product[Brand Type] = "Private"), [Total Sales Value])
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: 94fa9a6a-ff09-4f56-8bb4-b82ebc6074c5
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d7d09af6-ddea-4967-ae44-0015c21f8b39
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column 'Household Key'
+		dataType: string
+		isHidden
+		lineageTag: 2f202335-ddd7-4e40-9d98-b0931f764a04
+		summarizeBy: none
+		sourceColumn: household_sk
+
+	column 'Product Key'
+		dataType: string
+		isHidden
+		lineageTag: d2f447da-b2a5-4643-b1d9-9674934d9857
+		summarizeBy: none
+		sourceColumn: product_sk
+
+	column 'Store Key'
+		dataType: string
+		isHidden
+		lineageTag: abeff51e-d6d4-4c59-a241-2cb49f44263c
+		summarizeBy: none
+		sourceColumn: store_sk
+
+	column Quantity
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 54566cf4-792a-4afa-b50d-49f6a9803d31
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Shelf Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: c026d673-1b2a-4d70-ba92-48777b868ac5
+		summarizeBy: sum
+		sourceColumn: shelf_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sales Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 383a4afd-d5d6-4d3b-a457-a9957f7a619c
+		summarizeBy: sum
+		sourceColumn: sales_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer Paid Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 1c28774e-bce1-459d-b32a-20b8b07b8dd4
+		summarizeBy: sum
+		sourceColumn: customer_paid_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Loyalty Discount Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: a20f7f22-c106-4e1b-a28e-d9a31947fcb8
+		summarizeBy: sum
+		sourceColumn: loyalty_discount_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Coupon Discount Value'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 6ec85592-a7c1-4bcd-81ae-4dde20a1cc68
+		summarizeBy: sum
+		sourceColumn: coupon_discount_value
+
+		annotation SummarizationSetBy = Automatic
+
+	/// 1 when the line received a loyalty-card discount.
+	column 'Has Loyalty Discount'
+		dataType: int64
+		formatString: 0
+		lineageTag: e0be0ba9-9063-4517-8a94-64e79c6476b2
+		summarizeBy: sum
+		sourceColumn: has_loyalty_discount
+
+		annotation SummarizationSetBy = Automatic
+
+	/// 1 when a manufacturer coupon was used on the line.
+	column 'Has Coupon'
+		dataType: int64
+		formatString: 0
+		lineageTag: 151114f7-2454-4a39-b233-9303f48a4c9a
+		summarizeBy: sum
+		sourceColumn: has_coupon
+
+		annotation SummarizationSetBy = Automatic
+
+	column transaction_line_id
+		dataType: string
+		lineageTag: b77a38d9-3221-49b0-9c37-0907234a21fe
+		summarizeBy: none
+		sourceColumn: transaction_line_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column basket_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 42fc7d6a-9c1d-426a-9614-bb6cfc855d64
+		summarizeBy: sum
+		sourceColumn: basket_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column week_number
+		dataType: int64
+		formatString: 0
+		lineageTag: c6334e60-ef77-442e-9dd0-31dc1f4f648a
+		summarizeBy: sum
+		sourceColumn: week_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column transaction_time_hhmm
+		dataType: int64
+		formatString: 0
+		lineageTag: 5760c269-ef0d-43e6-8576-133c86916951
+		summarizeBy: sum
+		sourceColumn: transaction_time_hhmm
+
+		annotation SummarizationSetBy = Automatic
+
+	column coupon_match_discount_value
+		dataType: double
+		lineageTag: f2ba38eb-e2e6-4142-8400-fba0696e0f5a
+		summarizeBy: sum
+		sourceColumn: coupon_match_discount_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column shelf_unit_price
+		dataType: double
+		lineageTag: e5656260-83a1-465b-a786-295cc25711de
+		summarizeBy: sum
+		sourceColumn: shelf_unit_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column paid_unit_price
+		dataType: double
+		lineageTag: 21a39238-3f65-4af4-b5a2-522f7e4dfe9f
+		summarizeBy: sum
+		sourceColumn: paid_unit_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Sales = m
+		mode: import
+		source =
+				let
+					Data = wh_gold{[Schema="marts", Item="fct_sales_line"]}[Data]
+				in
+					Data
+
