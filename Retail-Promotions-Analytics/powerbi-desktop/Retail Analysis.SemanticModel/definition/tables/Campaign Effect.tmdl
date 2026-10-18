@@ -26,6 +26,24 @@ table 'Campaign Effect'
 		displayFolder: Campaign Effect
 		lineageTag: 1ee1458f-8fa6-4f96-950f-6c30d67bc211
 
+	/// Matched lift per household divided by campaign length in weeks, so campaigns of different lengths compare fairly.
+	measure 'Lift per Household per Week' = DIVIDE(SUMX('Campaign Effect', 'Campaign Effect'[Lift per Household Value] * 'Campaign Effect'[Active Targeted Households] * 7 / RELATED(Campaign[Duration Days])), SUM('Campaign Effect'[Active Targeted Households]))
+		formatString: £#,##0.00
+		displayFolder: Campaign Effect
+		lineageTag: 54c6f39a-034e-4116-9e47-219b95f7f93e
+
+	/// Campaigns with a complete before and during window, the ones the lift is measured on.
+	measure 'Campaigns Measured' = COUNTROWS('Campaign Effect')
+		formatString: #,##0
+		displayFolder: Campaign Effect
+		lineageTag: 50ffaabd-a9f2-414d-8231-fbd480d778cc
+
+	/// Average campaign length in days.
+	measure 'Average Campaign Days' = AVERAGEX('Campaign Effect', RELATED(Campaign[Duration Days]))
+		formatString: #,##0
+		displayFolder: Campaign Effect
+		lineageTag: 401f4108-1754-4465-9a69-a83a553df78a
+
 	column 'Campaign ID'
 		dataType: int64
 		isHidden

@@ -1,0 +1,223 @@
+{
+  "name": "campaign-types",
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "queryRef": "Campaign.Campaign Type",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign"
+                    }
+                  },
+                  "Property": "Campaign Type"
+                }
+              },
+              "nativeQueryRef": "Campaign Type",
+              "displayName": "Type"
+            },
+            {
+              "queryRef": "Campaign.Campaign Type Description",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign"
+                    }
+                  },
+                  "Property": "Campaign Type Description"
+                }
+              },
+              "nativeQueryRef": "Campaign Type Description",
+              "displayName": "How it works"
+            },
+            {
+              "queryRef": "Campaign Effect.Campaigns Measured",
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Campaigns Measured"
+                }
+              },
+              "nativeQueryRef": "Campaigns Measured",
+              "displayName": "Campaigns"
+            },
+            {
+              "queryRef": "Campaign Effect.Average Campaign Days",
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Average Campaign Days"
+                }
+              },
+              "nativeQueryRef": "Average Campaign Days",
+              "displayName": "Avg days"
+            },
+            {
+              "queryRef": "Campaign Effect.Campaign Lift %",
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Campaign Lift %"
+                }
+              },
+              "nativeQueryRef": "Campaign Lift %",
+              "displayName": "Campaign lift"
+            },
+            {
+              "queryRef": "Campaign Effect.Lift per Household",
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Lift per Household"
+                }
+              },
+              "nativeQueryRef": "Lift per Household",
+              "displayName": "Matched lift"
+            },
+            {
+              "queryRef": "Campaign Effect.Lift per Household per Week",
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign Effect"
+                    }
+                  },
+                  "Property": "Lift per Household per Week"
+                }
+              },
+              "nativeQueryRef": "Lift per Household per Week",
+              "displayName": "Matched lift per week"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Campaign"
+                  }
+                },
+                "Property": "Campaign Type"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "values": [
+        {
+          "properties": {
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Campaign types: lift per week compares campaigns of different lengths'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "position": {
+    "x": 24,
+    "y": 500,
+    "width": 1232,
+    "height": 204,
+    "z": 0,
+    "tabOrder": 0
+  },
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json"
+}

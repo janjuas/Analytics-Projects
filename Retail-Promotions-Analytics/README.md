@@ -22,7 +22,7 @@ and dbt and reported in Power BI. This report gives the findings and what they s
 | **Promotions** | Combining an in-store display with a mailer feature lifted weekly unit sales by 22%. A mailer alone gave 13%, a display alone 7%. Display on its own is the weakest mechanic in almost every department. |
 | **Discount depth** | Discounts between 1% and 30% barely change how many units a shopper puts in the basket (1.27–1.31 per line against 1.26 at full price). Only discounts above 30% show a clear jump, to 1.46. |
 | **Private label** | Own-label share held steady: 21.2% of merchandise sales in year 1, 21.5% in year 2. Packaged meat gained most (+2.8 points). |
-| **Campaigns** | Targeted households spent £41 more per campaign than similar households that were not targeted (+9.4%). Type A campaigns had the best response; Type C produced the largest lift per household. |
+| **Campaigns** | Targeted households spent £41 more per campaign than similar households that were not targeted (+9.4%). Type A campaigns had the best response. Type C's larger lift per household mostly reflects longer campaigns: per week, every type adds £6–7 per household. |
 | **Customers** | Higher-income households spend more and mostly use coupons more: 9–11% of trips in the 50–99K and 125–174K bands, against about 6% under 50K. The top bands are small, so this is directional. |
 
 ---
@@ -109,6 +109,21 @@ the same pre-campaign spend band.
 <sub>This is an observational estimate, not a randomised test. A household in the comparison group can be targeted by
 another campaign running at the same time, which would make the estimate conservative.</sub>
 
+#### What the campaign types mean
+
+| Type | How it works | Average length | Households per campaign | Extra spend / household / week |
+|---|---|---:|---:|---:|
+| Type A | Targeted: each household gets 16 coupons picked from a pool of about 200, based on what it has bought before | 48 days | about 800 | £5.94 |
+| Type B | Mass: every household in the campaign gets every coupon, about 16 | 37 days | about 140 | £6.86 |
+| Type C | Mass, like Type B, but runs about twice as long | 76 days | about 100 | £7.17 |
+| **All** | | 47 days | | **£6.37** |
+
+> **Type C's larger lift per household comes mostly from running about twice as long. Per week the three types are
+> close, at £5.94 to £7.17 per household, so campaign length, not type, explains most of the gap.**
+
+<sub>Type definitions are from the dunnhumby user guide, which describes Types B and C the same way. One Type B campaign
+runs past the end of the data, so lift is measured on 29 of the 30 campaigns and lengths are averaged over those 29.</sub>
+
 ###### FINDING 5
 
 ## Higher-income households spend more and use more coupons
@@ -138,8 +153,9 @@ directional.</sub>
    display alone shows little or no uplift, such as packaged seafood and produce.
 2. **Test fewer, deeper discounts.** Discounts of 1–30% do not change basket quantity. Run a controlled test that moves
    some of that spend to 30%+ offers on fewer lines, and measure margin as well as units.
-3. **Keep Type A campaigns and look at Type C economics.** Type A has the best redemption and percentage lift. Type C
-   gives the largest lift per household, so its cost per household decides whether it pays.
+3. **Keep Type A campaigns and judge the others per week.** Type A has the best redemption and percentage lift. Type
+   C's bigger lift per household comes from running about twice as long; per week it is close to Type B (£7.17 against
+   £6.86), so the cost of the extra weeks decides whether the longer run pays.
 4. **Measure every campaign against matched households.** The unmatched comparison understated the effect by about £39
    per household. The matched method is built into the data model and can be reused for future campaigns.
 5. **Fill the demographic gap.** Two-thirds of households have no demographics. Better coverage would make segment

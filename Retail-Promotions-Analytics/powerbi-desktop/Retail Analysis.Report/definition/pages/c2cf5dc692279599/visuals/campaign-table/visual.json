@@ -3,10 +3,10 @@
   "name": "057da3b8f49d201d",
   "position": {
     "x": 540,
-    "y": 288,
-    "z": 0,
-    "height": 408,
+    "y": 262,
     "width": 716,
+    "height": 226,
+    "z": 0,
     "tabOrder": 0
   },
   "visual": {
@@ -177,6 +177,21 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
   }
 }
