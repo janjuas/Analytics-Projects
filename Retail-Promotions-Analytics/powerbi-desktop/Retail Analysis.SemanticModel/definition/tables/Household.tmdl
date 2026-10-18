@@ -29,7 +29,7 @@ table Household
 		sourceColumn: age_band
 		sortByColumn: 'Age Band Sort'
 
-	/// Level1-12, ordinal (anonymised).
+	/// Annual household income range, Under 15K to 250K+.
 	column 'Income Band'
 		dataType: string
 		lineageTag: f9d8fe52-bba5-4913-9419-598135d026c8
@@ -137,6 +137,14 @@ table Household
 		lineageTag: af525d78-9fca-42c3-ad5d-efac2f691121
 		summarizeBy: sum
 		sourceColumn: last_purchase_day
+
+		annotation SummarizationSetBy = Automatic
+
+	column income_level
+		dataType: string
+		lineageTag: 6e3accb4-b3ac-4e2a-9d78-71a4cd29bc7c
+		summarizeBy: none
+		sourceColumn: income_level
 
 		annotation SummarizationSetBy = Automatic
 

@@ -11,6 +11,22 @@ seeds:
       - name: display_code
         data_tests: [unique, not_null]
 
+  - name: income_band_ranges
+    description: >
+      Annual household income range for each anonymised income level. The ranges are the income bands of the
+      original public release of this dataset; the household count in every level matches that release's band
+      for band (61, 74, 77, 172, 192, 96, 34, 38, 30, 11, 5, 11), so the order maps directly.
+    config:
+      column_types:
+        income_level: varchar(10)
+        income_range: varchar(20)
+        income_band_sort: int
+    columns:
+      - name: income_level
+        data_tests: [unique, not_null]
+      - name: income_range
+        data_tests: [unique, not_null]
+
   - name: mailer_location_codes
     description: Weekly mailer placement codes for causal_data.mailer, from the dunnhumby user guide.
     config:

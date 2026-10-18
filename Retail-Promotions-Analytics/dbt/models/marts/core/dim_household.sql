@@ -9,6 +9,10 @@ with households as (
 
 demographics as (
     select * from {{ ref('stg_silver__households') }}
+),
+
+income_ranges as (
+    select * from {{ ref('income_band_ranges') }}
 )
 
 select
@@ -18,7 +22,8 @@ select
 
     cast(coalesce(d.age_band, 'Unknown') as varchar(50))                      as age_band,
     cast(coalesce(d.marital_status_code, 'Unknown') as varchar(50))           as marital_status_code,
-    cast(coalesce(d.income_band, 'Unknown') as varchar(50))                   as income_band,
+    cast(coalesce(r.income_range, 'Unknown') as varchar(50))                  as income_band,
+    cast(coalesce(d.income_band, 'Unknown') as varchar(50))                   as income_level,
     cast(coalesce(d.household_size, 'Unknown') as varchar(50))                as household_size,
     cast(coalesce(d.household_composition, 'Unknown') as varchar(50))        as household_composition,
     cast(coalesce(d.homeowner_status, 'Unknown') as varchar(50))              as homeowner_status,
@@ -26,7 +31,7 @@ select
 
     -- the bands are ordinal; numeric sort keys let reports order them correctly (0 = unknown)
     cast(coalesce(cast(replace(d.age_band, 'Age Group', '') as int), 0) as int)         as age_band_sort,
-    cast(coalesce(cast(replace(d.income_band, 'Level', '') as int), 0) as int)          as income_band_sort,
+    cast(coalesce(r.income_band_sort, 0) as int)                                        as income_band_sort,
     cast(coalesce(cast(replace(d.household_size, '+', '') as int), 0) as int)           as household_size_sort,
     cast(coalesce(cast(replace(d.household_composition, 'Group', '') as int), 0) as int) as household_composition_sort,
     cast(case when d.children_band in ('1', '2', '3+') then cast(replace(d.children_band, '+', '') as int)
@@ -37,3 +42,5 @@ select
 from households as h
 left join demographics as d
     on h.household_key = d.household_key
+left join income_ranges as r
+    on d.income_band = r.income_level

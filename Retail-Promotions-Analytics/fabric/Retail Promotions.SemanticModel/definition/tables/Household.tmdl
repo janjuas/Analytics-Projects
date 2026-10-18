@@ -24,7 +24,7 @@ table Household
 		sourceColumn: age_band
 		sortByColumn: 'Age Band Sort'
 
-	/// Level1-12, ordinal (anonymised).
+	/// Annual household income range, Under 15K to 250K+.
 	column 'Income Band'
 		dataType: string
 		summarizeBy: none

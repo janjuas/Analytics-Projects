@@ -36,7 +36,7 @@ Built in `dbt/models/marts/analysis/`, merchandise only (`dim_product.is_merchan
 - **Promotion uplift:** weekly unit sales when a product is on display or in the mailer vs. when it isn't, by department.
 - **Price elasticity / discount depth:** sales response to `retail_discount` depth by commodity.
 - **Campaign ROI:** response rate and incremental spend of targeted vs. non-targeted households, by campaign type.
-- **Demographic segments (CACI angle):** spend, basket size and promo sensitivity by income band × household composition.
+- **Demographic segments (CACI angle):** spend, basket size and promo sensitivity by income range × household composition.
 - **Private label share:** private vs. national share by department over time.
 
 ## Tests
