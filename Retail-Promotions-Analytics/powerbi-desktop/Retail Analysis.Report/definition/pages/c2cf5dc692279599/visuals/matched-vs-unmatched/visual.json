@@ -1,5 +1,14 @@
 {
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "matched-vs-unmatched",
+  "position": {
+    "x": 24,
+    "y": 262,
+    "z": 0,
+    "height": 226,
+    "width": 500,
+    "tabOrder": 0
+  },
   "visual": {
     "visualType": "clusteredBarChart",
     "query": {
@@ -7,7 +16,6 @@
         "Category": {
           "projections": [
             {
-              "queryRef": "Campaign.Campaign Type",
               "field": {
                 "Column": {
                   "Expression": {
@@ -18,7 +26,9 @@
                   "Property": "Campaign Type"
                 }
               },
+              "queryRef": "Campaign.Campaign Type",
               "nativeQueryRef": "Campaign Type",
+              "active": true,
               "displayName": "Type"
             }
           ]
@@ -26,7 +36,6 @@
         "Y": {
           "projections": [
             {
-              "queryRef": "Campaign Effect.Lift per Household",
               "field": {
                 "Measure": {
                   "Expression": {
@@ -37,11 +46,11 @@
                   "Property": "Lift per Household"
                 }
               },
+              "queryRef": "Campaign Effect.Lift per Household",
               "nativeQueryRef": "Lift per Household",
               "displayName": "Matched lift"
             },
             {
-              "queryRef": "Campaign Effect.Unmatched Lift per Household",
               "field": {
                 "Measure": {
                   "Expression": {
@@ -52,6 +61,7 @@
                   "Property": "Unmatched Lift per Household"
                 }
               },
+              "queryRef": "Campaign Effect.Unmatched Lift per Household",
               "nativeQueryRef": "Unmatched Lift per Household",
               "displayName": "Unmatched lift"
             }
@@ -92,7 +102,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "title": [
         {
@@ -127,15 +136,7 @@
           }
         }
       ]
-    }
-  },
-  "position": {
-    "x": 24,
-    "y": 262,
-    "width": 500,
-    "height": 226,
-    "z": 0,
-    "tabOrder": 0
-  },
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json"
+    },
+    "drillFilterOtherVisuals": true
+  }
 }
