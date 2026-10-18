@@ -256,6 +256,90 @@ cultureInfo en-GB
 			          }
 			        }
 			      ]
+			    },
+			    "campaign_effect.campaigns_measured": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Campaign Effect",
+			          "ConceptualProperty": "Campaigns Measured"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Campaigns": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "campaign_effect.average_campaign_days": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Campaign Effect",
+			          "ConceptualProperty": "Average Campaign Days"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Avg days": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "campaign_effect.lift_per_household_per_week": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Campaign Effect",
+			          "ConceptualProperty": "Lift per Household per Week"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Matched lift per week": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "campaign.campaign_type_description": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Campaign",
+			          "ConceptualProperty": "Campaign Type Description"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "How it works": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
 			    }
 			  }
 			}
