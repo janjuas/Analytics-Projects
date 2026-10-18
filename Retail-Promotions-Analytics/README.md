@@ -17,7 +17,7 @@ and dbt and reported in Power BI. This report gives the findings and what they s
 
 ## Summary
 
-| | |
+| Area | Finding |
 |---|---|
 | **Promotions** | Combining an in-store display with a mailer feature lifted weekly unit sales by 22%. A mailer alone gave 13%, a display alone 7%. Display on its own is the weakest mechanic in almost every department. |
 | **Discount depth** | Discounts between 1% and 30% barely change how many units a shopper puts in the basket (1.27–1.31 per line against 1.26 at full price). Only discounts above 30% show a clear jump, to 1.46. |
